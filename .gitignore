@@ -1,0 +1,12 @@
+# Python virtual environment
+.venv/
+
+# Devbox environment
+.devbox/
+
+# Environment variables
+.env
+
+# IDE/editor settings
+.vscode/
+.idea/

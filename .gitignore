@@ -10,3 +10,6 @@
 # IDE/editor settings
 .vscode/
 .idea/
+
+# Python build directories
+/da_pipeline.egg-info/

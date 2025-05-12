@@ -66,7 +66,7 @@
 
             # Install dependencies
             ${log.info "Installing dependencies (including all groups)..."}
-            uv sync --all-groups
+            uv sync
 
             # Print helpful information
             echo ""

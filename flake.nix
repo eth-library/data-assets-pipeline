@@ -72,6 +72,7 @@
             echo ""
             ${log.success "Development environment activated!"}
             echo "Python version: $(python --version)"
+            echo "Python interpreter path: $(python -c 'import sys; print(sys.executable)')"
             echo "uv version: $(uv --version)"
             echo ""
             echo "Available commands:"

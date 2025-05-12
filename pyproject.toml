@@ -29,3 +29,8 @@ include = ["da_pipeline/**"]
 
 [tool.dagster]
 module_name = "da_pipeline"
+
+[dependency-groups]
+dev = [
+    "pytest>=8.3.5",
+]

@@ -2,54 +2,74 @@
 
 ## Overview
 
-This project aims to process digital assets within a data archive by extracting metadata
-from [METS (Metadata Encoding and Transmission Standard)](https://www.loc.gov/standards/mets/) files and assigning
-values to assets using a data model tailored for long-term archiving.
+This project implements a digital asset processing pipeline that implements the Submission Information Package (SIP)
+component of the Open Archival Information System (OAIS) reference model and METS (Metadata Encoding and Transmission
+Standard) specifications. It processes and manages digital assets within a data archive by extracting metadata from METS
+files and organizing them into structured SIPs.
 
-The workflows are managed using [Dagster](https://dagster.io/), a robust data orchestrator designed for machine
-learning, analytics, and ETL processes. The project is built to be **modular**, **scalable**, and **extensible**, making
-it well-suited for handling complex archiving workflows.
+The system utilizes [Dagster](https://dagster.io/) as its core data orchestrator, providing robust workflow management
+for complex archiving processes. The implementation ensures:
 
-## Getting started
+- **OAIS SIP Processing**: Implements the OAIS Submission Information Package model with structured metadata handling
+- **METS Standard Support**: Full parsing and processing of METS XML files
+- **Data Validation**: Robust validation using Pydantic models
+- **Scalable Architecture**: Modular design for handling complex archiving workflows
 
-First, install your Dagster code location as a Python package. By using the --editable flag, pip will install your
-Python package in ["editable mode"](https://pip.pypa.io/en/latest/topics/local-project-installs/#editable-installs) so
-that as you develop, local code changes will automatically apply.
+## Installation
+
+1. Clone the repository
+2. Install the package with development dependencies:
 
 ```bash
 pip install -e ".[dev]"
 ```
 
-Then, start the Dagster UI web server:
+Required dependencies:
+
+- [dagster](https://pypi.org/project/dagster/): Core orchestration framework
+- [dagster-cloud](https://pypi.org/project/dagster-cloud/): Cloud deployment support
+- [dagster-webserver](https://pypi.org/project/dagster-webserver/): Development UI
+- [pydantic](https://pypi.org/project/pydantic/): Data validation and modeling
+- [pytest](https://pypi.org/project/pytest/): Testing framework
+
+## Usage
+
+### Starting the Dagster UI
+
+Launch the Dagster web interface:
 
 ```bash
 dagster dev
 ```
 
-Open http://localhost:3000 with your browser to see the project.
+Access the UI at http://localhost:3000
 
-You can start writing assets in `da_pipeline/assets.py`. The assets are automatically loaded into the Dagster code
-location as you define them.
+### Running Tests
 
-## Development
-
-### Adding new Python dependencies
-
-You can specify new Python dependencies in `setup.py`.
-
-### Unit testing
-
-Tests are in the `da_pipeline_tests` directory and you can run tests using `pytest`:
+Execute the test suite:
 
 ```bash
 pytest da_pipeline_tests
 ```
 
-### Schedules and sensors
+## Project Configuration
 
-If you want to enable Dagster [Schedules](https://docs.dagster.io/concepts/partitions-schedules-sensors/schedules)
-or [Sensors](https://docs.dagster.io/concepts/partitions-schedules-sensors/sensors) for your jobs,
-the [Dagster Daemon](https://docs.dagster.io/deployment/dagster-daemon) process must be running. This is done
-automatically when you run `dagster dev`.
+The project configuration is split between package installation and runtime settings:
 
-Once your Dagster Daemon is running, you can start turning on schedules and sensors for your jobs.
+**Package Installation** 
+
+```bash
+pip install -e ".[dev]"
+```
+
+- `pyproject.toml`: Specifies the build system requirements and configuration for Python projects. As established by the
+ [PEP 518](https://peps.python.org/pep-0518/) standard.
+- [setuptools](https://setuptools.pypa.io/en/latest/userguide/declarative_config.html): Tools for package configuration and distribution:
+  - `setup.py`: Script for defining package dependencies, installation settings, and other setup instructions.
+  - `setup.cfg`: Declarative configuration file for package metadata and settings, enabling configuration without extensive Python code.
+
+**Dagster Runtime Configuration**:
+
+- `workspace.yaml`: Configures code locations for Dagster, telling it where to find your code and how to load it. For
+  more details, refer to
+  the [Dagster documentation on workspace.yaml](https://docs.dagster.io/guides/deploy/code-locations/workspace-yaml).

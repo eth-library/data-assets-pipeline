@@ -3,8 +3,8 @@
 
   # Define inputs with pinned versions for reproducibility
   inputs = {
-    # Use the NixOS 23.11 “stable” branch
-    nixpkgs.url = "github:NixOS/nixpkgs/nixos-23.11";
+    # Use the NixOS 24.11 “stable” branch
+    nixpkgs.url = "github:NixOS/nixpkgs/nixos-24.11";
     # flake-utils provides helper functions for working with flakes
     flake-utils.url = "github:numtide/flake-utils";
   };

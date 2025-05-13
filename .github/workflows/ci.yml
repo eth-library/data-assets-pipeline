@@ -1,24 +1,62 @@
 name: CI
 
+# Workflow for building and testing the Dagster data pipeline
+# Runs on pushes to main and all pull requests
 on:
   push:
     branches: [ main ]
   pull_request:
 
-jobs:
-  setup-dev-shell:
-    runs-on: ubuntu-latest
+# Environment variables used across jobs
+env:
+  PYTHON_VERSION: '3.12'
+  IMAGE_NAME: ghcr.io/${{ github.repository }}
+  TAG_LATEST: latest
+  TAG_SHA: ${{ github.sha }}
 
+jobs:
+  # Job to set up shell environment and run tests
+  setup-shell:
+    runs-on: ubuntu-latest
     steps:
-      # Checkout repository
+      # Checkout repository with the latest version
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       # Install Nix with Flakes support
       - name: Install Nix
         uses: cachix/install-nix-action@v31
 
-     # Set up Nix Flakes shell environment
+      # Set up Nix Flakes shell environment and run tests
       - name: Set up shell environment
         run: |
           nix develop --command true
+
+  # Job to build and publish Docker image
+  publish:
+    # Only run after a successful build and only on main branch pushes
+    needs: setup-shell
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    steps:
+      # Checkout repository with the latest version
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      # Log in to GitHub Container Registry (only when publishing)
+      - name: Log in to GitHub Container Registry
+        uses: docker/login-action@v2
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+        # Build and push Docker image
+      - name: Build and push Docker image
+        uses: docker/build-push-action@v4
+        with:
+          context: .
+          push: true
+          tags: |
+            ${{ env.IMAGE_NAME }}:${{ env.TAG_LATEST }}
+            ${{ env.IMAGE_NAME }}:${{ env.TAG_SHA }}

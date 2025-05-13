@@ -65,7 +65,7 @@
             fi
 
             # Install dependencies
-            ${log.info "Installing dependencies (including all groups)..."}
+            ${log.info "Installing Python dependencies with uv..."}
             uv sync
 
             # Print helpful information

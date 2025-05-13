@@ -20,17 +20,18 @@ dev = [
   "mypy>=1.15.0",
 ]
 
+production = [
+  "dagster-k8s>=0.26.14",
+  "dagster-postgres>=0.26.14",
+]
+
+[tool.dagster]
+module_name = "da_pipeline.definitions"
+code_location_name = "da_pipeline"
+
 [tool.hatch.build]
 packages = ["da_pipeline"]
 exclude = ["da_pipeline_tests"]
 
 [tool.hatch.build.targets.wheel]
 include = ["da_pipeline/**"]
-
-[tool.dagster]
-module_name = "da_pipeline"
-
-[dependency-groups]
-dev = [
-    "pytest>=8.3.5",
-]

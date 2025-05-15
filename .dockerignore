@@ -1,0 +1,7 @@
+*
+!pyproject.toml
+!uv.lock
+!da_pipeline/**
+!da_pipeline_tests/**
+!workspace.yaml
+!Dockerfile

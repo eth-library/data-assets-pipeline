@@ -9,7 +9,6 @@ on:
 
 # Environment variables used across jobs
 env:
-  PYTHON_VERSION: '3.12'
   IMAGE_NAME: ghcr.io/${{ github.repository }}
   TAG_LATEST: latest
   TAG_SHA: ${{ github.sha }}

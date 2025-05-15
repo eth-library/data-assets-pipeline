@@ -1,8 +1,14 @@
 # Base image - using Python 3.12 as specified in pyproject.toml (requires-python >= 3.12)
 FROM python:3.12
 
-# Copy the entire project into the root directory of the container
-# This includes all code, configuration files, and pyproject.toml
+# Update system packages
+RUN apt-get update && \
+    apt-get upgrade -y && \
+    apt-get install -y && \
+    apt-get clean && \
+    rm -rf /var/lib/apt/lists/*
+
+# Copy only the files not excluded by .dockerignore into the root directory of the container
 COPY . /
 
 # Configure Python to run in unbuffered mode

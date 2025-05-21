@@ -8,8 +8,8 @@ version = "0.1.0"
 requires-python = ">=3.12"
 
 dependencies = [
-  "dagster>=1.10.14",
-  "dagster-webserver>=1.10.14",
+  "dagster>=1.10.15",
+  "dagster-webserver>=1.10.15",
   "pydantic>=2.11.4",
 ]
 

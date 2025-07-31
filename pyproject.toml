@@ -11,6 +11,7 @@ dependencies = [
   "dagster>=1.10.15",
   "dagster-webserver>=1.10.15",
   "pydantic>=2.11.4",
+  "data-archive-models",
 ]
 
 [project.optional-dependencies]

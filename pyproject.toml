@@ -37,7 +37,10 @@ exclude = ["da_pipeline_tests"]
 [tool.hatch.build.targets.wheel]
 include = ["da_pipeline/**"]
 
-[tool.uv]
-index-url = "https://pypi.org/simple"
-extra-index-url = ["https://test.pypi.org/simple"]
-index-strategy = "unsafe-best-match"
+[tool.uv.sources]
+data-archive-models = { index = "testpypi" }
+
+[[tool.uv.index]]
+name = "testpypi"
+url = "https://test.pypi.org/simple"
+explicit = true

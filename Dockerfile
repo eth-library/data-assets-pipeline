@@ -23,7 +23,7 @@ RUN pip install --upgrade pip
 # - Core dependencies
 # - Production dependencies
 # as specified in pyproject.toml
-RUN pip install .[production]
+RUN pip install --extra-index-url=https://test.pypi.org/simple/ .[production]
 
 # Set the working directory to the main package directory
 # This aligns with the module_name in pyproject.toml [tool.dagster] section

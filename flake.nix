@@ -64,9 +64,9 @@
               uv lock
             fi
 
-            # Install dependencies
+            # Install dependencies including dev extras
             ${log.info "Installing Python dependencies with uv..."}
-            uv sync
+            uv sync -e dev
 
             # Print helpful information
             echo ""

@@ -51,7 +51,7 @@ def collect_fixity_details(all_fixities: List[FixityModel], files_by_id: Dict[st
         file = files_by_id.get(fx.file_id)
         if file:
             fixity_details.append({
-                "type": fx.fixity_type,
+                "type": fx.fixity_type.value,
                 "value": fx.fixity_value,
                 "file_id": fx.file_id,
                 "file_name": file.original_name,

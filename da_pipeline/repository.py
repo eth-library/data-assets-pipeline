@@ -1,17 +1,13 @@
-from dagster import repository, define_asset_job
+from dagster import define_asset_job, repository
 
-from da_pipeline.assets import (
-    sip_asset,
-    intellectual_entities, representations,
-    files, fixities
-)
+from da_pipeline.assets import files, fixities, intellectual_entities, representations, sip_asset
 from da_pipeline.sensors import xml_file_sensor
 
 # Define a job that materializes all assets in the correct order
 ingest_sip_job = define_asset_job(
-    "ingest_sip_job",
-    description="Processes METS XML files into OAIS-compliant SIPs"
+    "ingest_sip_job", description="Processes METS XML files into OAIS-compliant SIPs"
 )
+
 
 @repository
 def sip_repository():
@@ -55,5 +51,5 @@ def sip_repository():
         files,
         fixities,
         ingest_sip_job,
-        xml_file_sensor
+        xml_file_sensor,
     ]

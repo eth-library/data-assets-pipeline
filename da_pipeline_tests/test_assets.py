@@ -1,11 +1,9 @@
 import os
+
 import pytest
 from dagster import materialize
 
-from da_pipeline.assets import (
-    sip_asset, intellectual_entities,
-    representations, files, fixities
-)
+from da_pipeline.assets import files, fixities, intellectual_entities, representations, sip_asset
 
 
 @pytest.fixture
@@ -14,13 +12,9 @@ def mets_file_path():
     Returns the path to a static METS XML file stored in the repo.
     Used as a fixture for both single and multiple file tests.
     """
-   # __file__ is the current Python file (test_sip_pipeline.py).
+    # __file__ is the current Python file (test_sip_pipeline.py).
     # We go up one directory to 'test_data', then the 'mets_sample.xml'.
-    return os.path.join(
-        os.path.dirname(__file__),
-        "test_data",
-        "synthetic_sip.xml"
-    )
+    return os.path.join(os.path.dirname(__file__), "test_data", "synthetic_sip.xml")
 
 
 def test_sip_pipeline_single_file(mets_file_path):
@@ -33,22 +27,8 @@ def test_sip_pipeline_single_file(mets_file_path):
     # to the sip_asset's file_paths configuration.
 
     result = materialize(
-        assets=[
-            sip_asset,
-            intellectual_entities,
-            representations,
-            files,
-            fixities
-        ],
-        run_config={
-            "ops": {
-                "sip_asset": {
-                    "config": {
-                        "file_paths": [mets_file_path]
-                    }
-                }
-            }
-        },
+        assets=[sip_asset, intellectual_entities, representations, files, fixities],
+        run_config={"ops": {"sip_asset": {"config": {"file_paths": [mets_file_path]}}}},
     )
 
     assert result.success
@@ -133,7 +113,7 @@ def test_sip_pipeline_single_file(mets_file_path):
     fixities_by_file = metadata["Fixities by File"].value
     assert isinstance(fixities_by_file, dict)
 
-    for file_id, file_data in fixities_by_file.items():
+    for _file_id, file_data in fixities_by_file.items():
         assert "file_name" in file_data
         assert "file_label" in file_data
         assert "fixities" in file_data
@@ -150,21 +130,9 @@ def test_sip_pipeline_multiple_files(mets_file_path):
     """
     # Use the same file twice to test multiple file handling
     result = materialize(
-        assets=[
-            sip_asset,
-            intellectual_entities,
-            representations,
-            files,
-            fixities
-        ],
+        assets=[sip_asset, intellectual_entities, representations, files, fixities],
         run_config={
-            "ops": {
-                "sip_asset": {
-                    "config": {
-                        "file_paths": [mets_file_path, mets_file_path]
-                    }
-                }
-            }
+            "ops": {"sip_asset": {"config": {"file_paths": [mets_file_path, mets_file_path]}}}
         },
     )
 

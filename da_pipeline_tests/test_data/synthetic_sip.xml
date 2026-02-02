@@ -1,0 +1,516 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Synthetic METS XML Test Data
+
+  This file contains fictional data for testing the Data Assets Pipeline.
+  All names, identifiers, and checksums are synthetic and do not represent
+  real research materials or persons.
+
+  Structure:
+    - 1 Intellectual Entity (a fictional research paper)
+    - 2 Representations (preservation master and access copy)
+    - 4 Files total with synthetic checksums
+
+  Uses PREMIS v3 (http://www.loc.gov/premis/v3) for preservation metadata.
+-->
+<mets:mets xmlns:mets="http://www.loc.gov/METS/"
+           xmlns:premis="http://www.loc.gov/premis/v3"
+           xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <!-- Intellectual Entity Descriptive Metadata -->
+  <mets:dmdSec ID="ie-dmd">
+    <mets:mdWrap MDTYPE="DC">
+      <mets:xmlData>
+        <dc:record xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:dcterms="http://purl.org/dc/terms/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+          <dc:type>Research Paper</dc:type>
+          <dc:title>Advances in Synthetic Data Generation for Digital Preservation Testing</dc:title>
+          <dc:creator>Doe, Jane</dc:creator>
+          <dc:creator>Smith, John</dc:creator>
+          <dc:identifier>http://doi.org/10.0000/synthetic-test-001</dc:identifier>
+          <dc:identifier>https://example.org/archive/synthetic-test-001</dc:identifier>
+          <dc:rights>Creative Commons Attribution 4.0</dc:rights>
+          <dc:rights>Open Access</dc:rights>
+          <dc:date>2024-01-15</dc:date>
+          <dc:description>A synthetic research paper created for testing digital preservation workflows.</dc:description>
+          <dc:subject>Digital Preservation</dc:subject>
+          <dc:subject>Test Data</dc:subject>
+          <dc:subject>OAIS</dc:subject>
+          <dc:language>en</dc:language>
+          <dc:publisher>Synthetic Research Institute</dc:publisher>
+        </dc:record>
+      </mets:xmlData>
+    </mets:mdWrap>
+  </mets:dmdSec>
+
+  <!-- File 1 Descriptive Metadata (Preservation Master PDF) -->
+  <mets:dmdSec ID="fid1-1-dmd">
+    <mets:mdWrap MDTYPE="DC">
+      <mets:xmlData>
+        <dc:record xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:dcterms="http://purl.org/dc/terms/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+          <dc:rights>Open Access</dc:rights>
+          <dc:format>application/pdf</dc:format>
+          <dc:description>Full text preservation master</dc:description>
+        </dc:record>
+      </mets:xmlData>
+    </mets:mdWrap>
+  </mets:dmdSec>
+
+  <!-- File 2 Descriptive Metadata (Supplementary Data) -->
+  <mets:dmdSec ID="fid2-1-dmd">
+    <mets:mdWrap MDTYPE="DC">
+      <mets:xmlData>
+        <dc:record xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:dcterms="http://purl.org/dc/terms/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+          <dc:rights>Open Access</dc:rights>
+          <dc:format>text/csv</dc:format>
+          <dc:description>Supplementary research data</dc:description>
+        </dc:record>
+      </mets:xmlData>
+    </mets:mdWrap>
+  </mets:dmdSec>
+
+  <!-- File 3 Descriptive Metadata (Access Copy PDF) -->
+  <mets:dmdSec ID="fid3-1-dmd">
+    <mets:mdWrap MDTYPE="DC">
+      <mets:xmlData>
+        <dc:record xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:dcterms="http://purl.org/dc/terms/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+          <dc:rights>Open Access</dc:rights>
+          <dc:format>application/pdf</dc:format>
+          <dc:description>Access copy with reduced resolution</dc:description>
+        </dc:record>
+      </mets:xmlData>
+    </mets:mdWrap>
+  </mets:dmdSec>
+
+  <!-- File 4 Descriptive Metadata (METS Manifest) -->
+  <mets:dmdSec ID="fid4-1-dmd">
+    <mets:mdWrap MDTYPE="DC">
+      <mets:xmlData>
+        <dc:record xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:dcterms="http://purl.org/dc/terms/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+          <dc:rights>Open Access</dc:rights>
+          <dc:format>application/xml</dc:format>
+          <dc:description>Package manifest</dc:description>
+        </dc:record>
+      </mets:xmlData>
+    </mets:mdWrap>
+  </mets:dmdSec>
+
+  <!-- Representation 1: Preservation Master -->
+  <mets:amdSec ID="rep1-amd">
+    <mets:techMD ID="rep1-amd-tech">
+      <mets:mdWrap MDTYPE="PREMIS:OBJECT">
+        <mets:xmlData>
+          <premis:object xsi:type="premis:representation">
+            <premis:objectIdentifier>
+              <premis:objectIdentifierType>local</premis:objectIdentifierType>
+              <premis:objectIdentifierValue>rep1</premis:objectIdentifierValue>
+            </premis:objectIdentifier>
+            <premis:preservationLevel>
+              <premis:preservationLevelType>PRESERVATION_MASTER</premis:preservationLevelType>
+              <premis:preservationLevelValue>VIEW</premis:preservationLevelValue>
+            </premis:preservationLevel>
+            <premis:significantProperties>
+              <premis:significantPropertiesType>label</premis:significantPropertiesType>
+              <premis:significantPropertiesValue>Preservation Master</premis:significantPropertiesValue>
+            </premis:significantProperties>
+            <premis:significantProperties>
+              <premis:significantPropertiesType>RevisionNumber</premis:significantPropertiesType>
+              <premis:significantPropertiesValue>1</premis:significantPropertiesValue>
+            </premis:significantProperties>
+          </premis:object>
+        </mets:xmlData>
+      </mets:mdWrap>
+    </mets:techMD>
+    <mets:rightsMD ID="rep1-amd-rights">
+      <mets:mdWrap MDTYPE="PREMIS">
+        <mets:xmlData/>
+      </mets:mdWrap>
+    </mets:rightsMD>
+    <mets:sourceMD ID="rep1-amd-source">
+      <mets:mdWrap MDTYPE="PREMIS">
+        <mets:xmlData/>
+      </mets:mdWrap>
+    </mets:sourceMD>
+    <mets:digiprovMD ID="rep1-amd-digiprov">
+      <mets:mdWrap MDTYPE="PREMIS">
+        <mets:xmlData/>
+      </mets:mdWrap>
+    </mets:digiprovMD>
+  </mets:amdSec>
+
+  <!-- Representation 2: Access Copy -->
+  <mets:amdSec ID="rep2-amd">
+    <mets:techMD ID="rep2-amd-tech">
+      <mets:mdWrap MDTYPE="PREMIS:OBJECT">
+        <mets:xmlData>
+          <premis:object xsi:type="premis:representation">
+            <premis:objectIdentifier>
+              <premis:objectIdentifierType>local</premis:objectIdentifierType>
+              <premis:objectIdentifierValue>rep2</premis:objectIdentifierValue>
+            </premis:objectIdentifier>
+            <premis:preservationLevel>
+              <premis:preservationLevelType>DERIVATIVE_COPY</premis:preservationLevelType>
+              <premis:preservationLevelValue>VIEW</premis:preservationLevelValue>
+            </premis:preservationLevel>
+            <premis:significantProperties>
+              <premis:significantPropertiesType>label</premis:significantPropertiesType>
+              <premis:significantPropertiesValue>Access Copy</premis:significantPropertiesValue>
+            </premis:significantProperties>
+            <premis:significantProperties>
+              <premis:significantPropertiesType>RevisionNumber</premis:significantPropertiesType>
+              <premis:significantPropertiesValue>1</premis:significantPropertiesValue>
+            </premis:significantProperties>
+          </premis:object>
+        </mets:xmlData>
+      </mets:mdWrap>
+    </mets:techMD>
+    <mets:rightsMD ID="rep2-amd-rights">
+      <mets:mdWrap MDTYPE="PREMIS">
+        <mets:xmlData/>
+      </mets:mdWrap>
+    </mets:rightsMD>
+    <mets:sourceMD ID="rep2-amd-source">
+      <mets:mdWrap MDTYPE="PREMIS">
+        <mets:xmlData/>
+      </mets:mdWrap>
+    </mets:sourceMD>
+    <mets:digiprovMD ID="rep2-amd-digiprov">
+      <mets:mdWrap MDTYPE="PREMIS">
+        <mets:xmlData/>
+      </mets:mdWrap>
+    </mets:digiprovMD>
+  </mets:amdSec>
+
+  <!-- File 1 Technical Metadata: Preservation Master PDF -->
+  <mets:amdSec ID="fid1-1-amd">
+    <mets:techMD ID="fid1-1-amd-tech">
+      <mets:mdWrap MDTYPE="PREMIS:OBJECT">
+        <mets:xmlData>
+          <premis:object xsi:type="premis:file">
+            <premis:objectIdentifier>
+              <premis:objectIdentifierType>local</premis:objectIdentifierType>
+              <premis:objectIdentifierValue>fid1-1</premis:objectIdentifierValue>
+            </premis:objectIdentifier>
+            <premis:objectCharacteristics>
+              <premis:compositionLevel>0</premis:compositionLevel>
+              <premis:fixity>
+                <premis:messageDigestAlgorithm>SHA-256</premis:messageDigestAlgorithm>
+                <premis:messageDigest>a1b2c3d4e5f6a7b8c9d0e1f2a3b4c5d6e7f8a9b0c1d2e3f4a5b6c7d8e9f0a1b2</premis:messageDigest>
+                <premis:messageDigestOriginator>preservation-system</premis:messageDigestOriginator>
+              </premis:fixity>
+              <premis:fixity>
+                <premis:messageDigestAlgorithm>MD5</premis:messageDigestAlgorithm>
+                <premis:messageDigest>a1b2c3d4e5f6a7b8c9d0e1f2a3b4c5d6</premis:messageDigest>
+                <premis:messageDigestOriginator>preservation-system</premis:messageDigestOriginator>
+              </premis:fixity>
+              <premis:size>2048576</premis:size>
+              <premis:format>
+                <premis:formatDesignation>
+                  <premis:formatName>application/pdf</premis:formatName>
+                </premis:formatDesignation>
+              </premis:format>
+              <premis:creatingApplication>
+                <premis:creatingApplicationName>Test Generator</premis:creatingApplicationName>
+                <premis:dateCreatedByApplication>2024-01-15T10:30:00Z</premis:dateCreatedByApplication>
+              </premis:creatingApplication>
+            </premis:objectCharacteristics>
+            <premis:originalName>synthetic-paper-master.pdf</premis:originalName>
+            <premis:storage>
+              <premis:contentLocation>
+                <premis:contentLocationType>filepath</premis:contentLocationType>
+                <premis:contentLocationValue>/archive/synthetic/001/master/synthetic-paper-master.pdf</premis:contentLocationValue>
+              </premis:contentLocation>
+            </premis:storage>
+          </premis:object>
+        </mets:xmlData>
+      </mets:mdWrap>
+    </mets:techMD>
+    <mets:rightsMD ID="fid1-1-amd-rights">
+      <mets:mdWrap MDTYPE="PREMIS">
+        <mets:xmlData/>
+      </mets:mdWrap>
+    </mets:rightsMD>
+    <mets:sourceMD ID="fid1-1-amd-source">
+      <mets:mdWrap MDTYPE="PREMIS">
+        <mets:xmlData/>
+      </mets:mdWrap>
+    </mets:sourceMD>
+    <mets:digiprovMD ID="fid1-1-amd-digiprov">
+      <mets:mdWrap MDTYPE="PREMIS">
+        <mets:xmlData/>
+      </mets:mdWrap>
+    </mets:digiprovMD>
+  </mets:amdSec>
+
+  <!-- File 2 Technical Metadata: Supplementary Data CSV -->
+  <mets:amdSec ID="fid2-1-amd">
+    <mets:techMD ID="fid2-1-amd-tech">
+      <mets:mdWrap MDTYPE="PREMIS:OBJECT">
+        <mets:xmlData>
+          <premis:object xsi:type="premis:file">
+            <premis:objectIdentifier>
+              <premis:objectIdentifierType>local</premis:objectIdentifierType>
+              <premis:objectIdentifierValue>fid2-1</premis:objectIdentifierValue>
+            </premis:objectIdentifier>
+            <premis:objectCharacteristics>
+              <premis:compositionLevel>0</premis:compositionLevel>
+              <premis:fixity>
+                <premis:messageDigestAlgorithm>SHA-256</premis:messageDigestAlgorithm>
+                <premis:messageDigest>b2c3d4e5f6a7b8c9d0e1f2a3b4c5d6e7f8a9b0c1d2e3f4a5b6c7d8e9f0a1b2c3</premis:messageDigest>
+                <premis:messageDigestOriginator>preservation-system</premis:messageDigestOriginator>
+              </premis:fixity>
+              <premis:size>15360</premis:size>
+              <premis:format>
+                <premis:formatDesignation>
+                  <premis:formatName>text/csv</premis:formatName>
+                </premis:formatDesignation>
+              </premis:format>
+              <premis:creatingApplication>
+                <premis:creatingApplicationName>Test Generator</premis:creatingApplicationName>
+                <premis:dateCreatedByApplication>2024-01-14T14:20:00Z</premis:dateCreatedByApplication>
+              </premis:creatingApplication>
+            </premis:objectCharacteristics>
+            <premis:originalName>supplementary-data.csv</premis:originalName>
+            <premis:storage>
+              <premis:contentLocation>
+                <premis:contentLocationType>filepath</premis:contentLocationType>
+                <premis:contentLocationValue>/archive/synthetic/001/master/supplementary-data.csv</premis:contentLocationValue>
+              </premis:contentLocation>
+            </premis:storage>
+          </premis:object>
+        </mets:xmlData>
+      </mets:mdWrap>
+    </mets:techMD>
+    <mets:rightsMD ID="fid2-1-amd-rights">
+      <mets:mdWrap MDTYPE="PREMIS">
+        <mets:xmlData/>
+      </mets:mdWrap>
+    </mets:rightsMD>
+    <mets:sourceMD ID="fid2-1-amd-source">
+      <mets:mdWrap MDTYPE="PREMIS">
+        <mets:xmlData/>
+      </mets:mdWrap>
+    </mets:sourceMD>
+    <mets:digiprovMD ID="fid2-1-amd-digiprov">
+      <mets:mdWrap MDTYPE="PREMIS">
+        <mets:xmlData/>
+      </mets:mdWrap>
+    </mets:digiprovMD>
+  </mets:amdSec>
+
+  <!-- File 3 Technical Metadata: Access Copy PDF -->
+  <mets:amdSec ID="fid3-1-amd">
+    <mets:techMD ID="fid3-1-amd-tech">
+      <mets:mdWrap MDTYPE="PREMIS:OBJECT">
+        <mets:xmlData>
+          <premis:object xsi:type="premis:file">
+            <premis:objectIdentifier>
+              <premis:objectIdentifierType>local</premis:objectIdentifierType>
+              <premis:objectIdentifierValue>fid3-1</premis:objectIdentifierValue>
+            </premis:objectIdentifier>
+            <premis:objectCharacteristics>
+              <premis:compositionLevel>0</premis:compositionLevel>
+              <premis:fixity>
+                <premis:messageDigestAlgorithm>SHA-256</premis:messageDigestAlgorithm>
+                <premis:messageDigest>c3d4e5f6a7b8c9d0e1f2a3b4c5d6e7f8a9b0c1d2e3f4a5b6c7d8e9f0a1b2c3d4</premis:messageDigest>
+                <premis:messageDigestOriginator>preservation-system</premis:messageDigestOriginator>
+              </premis:fixity>
+              <premis:size>512000</premis:size>
+              <premis:format>
+                <premis:formatDesignation>
+                  <premis:formatName>application/pdf</premis:formatName>
+                </premis:formatDesignation>
+              </premis:format>
+              <premis:creatingApplication>
+                <premis:creatingApplicationName>Test Generator</premis:creatingApplicationName>
+                <premis:dateCreatedByApplication>2024-01-15T11:00:00Z</premis:dateCreatedByApplication>
+              </premis:creatingApplication>
+            </premis:objectCharacteristics>
+            <premis:originalName>synthetic-paper-access.pdf</premis:originalName>
+            <premis:storage>
+              <premis:contentLocation>
+                <premis:contentLocationType>filepath</premis:contentLocationType>
+                <premis:contentLocationValue>/archive/synthetic/001/access/synthetic-paper-access.pdf</premis:contentLocationValue>
+              </premis:contentLocation>
+            </premis:storage>
+          </premis:object>
+        </mets:xmlData>
+      </mets:mdWrap>
+    </mets:techMD>
+    <mets:rightsMD ID="fid3-1-amd-rights">
+      <mets:mdWrap MDTYPE="PREMIS">
+        <mets:xmlData/>
+      </mets:mdWrap>
+    </mets:rightsMD>
+    <mets:sourceMD ID="fid3-1-amd-source">
+      <mets:mdWrap MDTYPE="PREMIS">
+        <mets:xmlData/>
+      </mets:mdWrap>
+    </mets:sourceMD>
+    <mets:digiprovMD ID="fid3-1-amd-digiprov">
+      <mets:mdWrap MDTYPE="PREMIS">
+        <mets:xmlData/>
+      </mets:mdWrap>
+    </mets:digiprovMD>
+  </mets:amdSec>
+
+  <!-- File 4 Technical Metadata: METS Manifest -->
+  <mets:amdSec ID="fid4-1-amd">
+    <mets:techMD ID="fid4-1-amd-tech">
+      <mets:mdWrap MDTYPE="PREMIS:OBJECT">
+        <mets:xmlData>
+          <premis:object xsi:type="premis:file">
+            <premis:objectIdentifier>
+              <premis:objectIdentifierType>local</premis:objectIdentifierType>
+              <premis:objectIdentifierValue>fid4-1</premis:objectIdentifierValue>
+            </premis:objectIdentifier>
+            <premis:objectCharacteristics>
+              <premis:compositionLevel>0</premis:compositionLevel>
+              <premis:fixity>
+                <premis:messageDigestAlgorithm>MD5</premis:messageDigestAlgorithm>
+                <premis:messageDigest>d4e5f6a7b8c9d0e1f2a3b4c5d6e7f8a9</premis:messageDigest>
+                <premis:messageDigestOriginator>preservation-system</premis:messageDigestOriginator>
+              </premis:fixity>
+              <premis:size>8192</premis:size>
+              <premis:format>
+                <premis:formatDesignation>
+                  <premis:formatName>application/xml</premis:formatName>
+                </premis:formatDesignation>
+              </premis:format>
+              <premis:creatingApplication>
+                <premis:creatingApplicationName>Test Generator</premis:creatingApplicationName>
+                <premis:dateCreatedByApplication>2024-01-15T12:00:00Z</premis:dateCreatedByApplication>
+              </premis:creatingApplication>
+            </premis:objectCharacteristics>
+            <premis:originalName>mets.xml</premis:originalName>
+            <premis:storage>
+              <premis:contentLocation>
+                <premis:contentLocationType>filepath</premis:contentLocationType>
+                <premis:contentLocationValue>/archive/synthetic/001/master/mets.xml</premis:contentLocationValue>
+              </premis:contentLocation>
+            </premis:storage>
+          </premis:object>
+        </mets:xmlData>
+      </mets:mdWrap>
+    </mets:techMD>
+    <mets:rightsMD ID="fid4-1-amd-rights">
+      <mets:mdWrap MDTYPE="PREMIS">
+        <mets:xmlData/>
+      </mets:mdWrap>
+    </mets:rightsMD>
+    <mets:sourceMD ID="fid4-1-amd-source">
+      <mets:mdWrap MDTYPE="PREMIS">
+        <mets:xmlData/>
+      </mets:mdWrap>
+    </mets:sourceMD>
+    <mets:digiprovMD ID="fid4-1-amd-digiprov">
+      <mets:mdWrap MDTYPE="PREMIS">
+        <mets:xmlData/>
+      </mets:mdWrap>
+    </mets:digiprovMD>
+  </mets:amdSec>
+
+  <!-- Intellectual Entity Administrative Metadata -->
+  <mets:amdSec ID="ie-amd">
+    <mets:techMD ID="ie-amd-tech">
+      <mets:mdWrap MDTYPE="PREMIS:OBJECT">
+        <mets:xmlData>
+          <premis:object xsi:type="premis:intellectualEntity">
+            <premis:objectIdentifier>
+              <premis:objectIdentifierType>local</premis:objectIdentifierType>
+              <premis:objectIdentifierValue>ie-001</premis:objectIdentifierValue>
+            </premis:objectIdentifier>
+            <premis:significantProperties>
+              <premis:significantPropertiesType>IEEntityType</premis:significantPropertiesType>
+              <premis:significantPropertiesValue>SyntheticTest</premis:significantPropertiesValue>
+            </premis:significantProperties>
+            <premis:significantProperties>
+              <premis:significantPropertiesType>status</premis:significantPropertiesType>
+              <premis:significantPropertiesValue>ACTIVE</premis:significantPropertiesValue>
+            </premis:significantProperties>
+            <premis:significantProperties>
+              <premis:significantPropertiesType>UserDefinedA</premis:significantPropertiesType>
+              <premis:significantPropertiesValue>test-collection-001</premis:significantPropertiesValue>
+            </premis:significantProperties>
+          </premis:object>
+        </mets:xmlData>
+      </mets:mdWrap>
+    </mets:techMD>
+    <mets:rightsMD ID="ie-amd-rights">
+      <mets:mdWrap MDTYPE="PREMIS:RIGHTS">
+        <mets:xmlData>
+          <premis:rights>
+            <premis:rightsStatement>
+              <premis:rightsStatementIdentifier>
+                <premis:rightsStatementIdentifierType>local</premis:rightsStatementIdentifierType>
+                <premis:rightsStatementIdentifierValue>100001</premis:rightsStatementIdentifierValue>
+              </premis:rightsStatementIdentifier>
+              <premis:rightsBasis>policy</premis:rightsBasis>
+              <premis:otherRightsInformation>
+                <premis:otherRightsBasis>access-policy</premis:otherRightsBasis>
+                <premis:otherRightsNote>Open Access - No Restrictions</premis:otherRightsNote>
+              </premis:otherRightsInformation>
+            </premis:rightsStatement>
+          </premis:rights>
+        </mets:xmlData>
+      </mets:mdWrap>
+    </mets:rightsMD>
+    <mets:sourceMD ID="ie-amd-source">
+      <mets:mdWrap MDTYPE="PREMIS">
+        <mets:xmlData/>
+      </mets:mdWrap>
+    </mets:sourceMD>
+    <mets:digiprovMD ID="ie-amd-digiprov">
+      <mets:mdWrap MDTYPE="PREMIS">
+        <mets:xmlData/>
+      </mets:mdWrap>
+    </mets:digiprovMD>
+  </mets:amdSec>
+
+  <!-- File Section: Groups files by representation -->
+  <mets:fileSec>
+    <!-- Representation 1: Preservation Master (2 files) -->
+    <mets:fileGrp ID="rep1" ADMID="rep1-amd">
+      <mets:file ID="fid1-1" DMDID="fid1-1-dmd" ADMID="fid1-1-amd">
+        <mets:FLocat LOCTYPE="URL" xlin:href="synthetic-paper-master.pdf" xmlns:xlin="http://www.w3.org/1999/xlink"/>
+      </mets:file>
+      <mets:file ID="fid2-1" DMDID="fid2-1-dmd" ADMID="fid2-1-amd">
+        <mets:FLocat LOCTYPE="URL" xlin:href="supplementary-data.csv" xmlns:xlin="http://www.w3.org/1999/xlink"/>
+      </mets:file>
+      <mets:file ID="fid4-1" DMDID="fid4-1-dmd" ADMID="fid4-1-amd">
+        <mets:FLocat LOCTYPE="URL" xlin:href="mets.xml" xmlns:xlin="http://www.w3.org/1999/xlink"/>
+      </mets:file>
+    </mets:fileGrp>
+    <!-- Representation 2: Access Copy (1 file) -->
+    <mets:fileGrp ID="rep2" ADMID="rep2-amd">
+      <mets:file ID="fid3-1" DMDID="fid3-1-dmd" ADMID="fid3-1-amd">
+        <mets:FLocat LOCTYPE="URL" xlin:href="synthetic-paper-access.pdf" xmlns:xlin="http://www.w3.org/1999/xlink"/>
+      </mets:file>
+    </mets:fileGrp>
+  </mets:fileSec>
+
+  <!-- Structure Map: Defines logical structure of the package -->
+  <mets:structMap ID="rep1-1" TYPE="PHYSICAL">
+    <mets:div LABEL="PRESERVATION_MASTER;VIEW">
+      <mets:div LABEL="Content Files">
+        <mets:div LABEL="synthetic-paper-master.pdf" TYPE="FILE">
+          <mets:fptr FILEID="fid1-1"/>
+        </mets:div>
+        <mets:div LABEL="supplementary-data.csv" TYPE="FILE">
+          <mets:fptr FILEID="fid2-1"/>
+        </mets:div>
+        <mets:div LABEL="mets.xml" TYPE="FILE">
+          <mets:fptr FILEID="fid4-1"/>
+        </mets:div>
+      </mets:div>
+    </mets:div>
+  </mets:structMap>
+
+  <mets:structMap ID="rep2-1" TYPE="PHYSICAL">
+    <mets:div LABEL="DERIVATIVE_COPY;VIEW">
+      <mets:div LABEL="Access Files">
+        <mets:div LABEL="synthetic-paper-access.pdf" TYPE="FILE">
+          <mets:fptr FILEID="fid3-1"/>
+        </mets:div>
+      </mets:div>
+    </mets:div>
+  </mets:structMap>
+</mets:mets>

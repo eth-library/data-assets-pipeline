@@ -1,11 +1,11 @@
 """Utility functions for the DA Pipeline."""
 
-from typing import Dict, List
 from dagster import MetadataValue
-from da_pipeline.pydantic_models import IEModel, FixityModel, FileModel
+
+from da_pipeline.pydantic_models import FileModel, FixityModel, IEModel
 
 
-def collect_dc_metadata(ie_list: List[IEModel]) -> dict:
+def collect_dc_metadata(ie_list: list[IEModel]) -> dict:
     """Collect Dublin Core metadata from a list of Intellectual Entities.
 
     Args:
@@ -36,7 +36,9 @@ def collect_dc_metadata(ie_list: List[IEModel]) -> dict:
     }
 
 
-def collect_fixity_details(all_fixities: List[FixityModel], files_by_id: Dict[str, FileModel]) -> List[dict]:
+def collect_fixity_details(
+    all_fixities: list[FixityModel], files_by_id: dict[str, FileModel]
+) -> list[dict]:
     """Collect detailed fixity information with associated file data.
 
     Args:
@@ -50,17 +52,19 @@ def collect_fixity_details(all_fixities: List[FixityModel], files_by_id: Dict[st
     for fx in all_fixities:
         file = files_by_id.get(fx.file_id)
         if file:
-            fixity_details.append({
-                "type": fx.fixity_type.value,
-                "value": fx.fixity_value,
-                "file_id": fx.file_id,
-                "file_name": file.original_name,
-                "file_label": file.label
-            })
+            fixity_details.append(
+                {
+                    "type": fx.fixity_type.value,
+                    "value": fx.fixity_value,
+                    "file_id": fx.file_id,
+                    "file_name": file.original_name,
+                    "file_label": file.label,
+                }
+            )
     return fixity_details
 
 
-def group_fixities_by_file(fixity_details: List[dict]) -> Dict[str, dict]:
+def group_fixities_by_file(fixity_details: list[dict]) -> dict[str, dict]:
     """Group fixity information by file.
 
     Args:
@@ -76,10 +80,9 @@ def group_fixities_by_file(fixity_details: List[dict]) -> Dict[str, dict]:
             fixities_by_file[file_id] = {
                 "file_name": detail["file_name"],
                 "file_label": detail["file_label"],
-                "fixities": []
+                "fixities": [],
             }
-        fixities_by_file[file_id]["fixities"].append({
-            "type": detail["type"],
-            "value": detail["value"]
-        })
+        fixities_by_file[file_id]["fixities"].append(
+            {"type": detail["type"], "value": detail["value"]}
+        )
     return fixities_by_file

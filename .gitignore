@@ -20,3 +20,5 @@
 # Dagster
 .dagster/
 .tmp_dagster_home_*/
+/history/
+/schedules/

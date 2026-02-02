@@ -44,12 +44,11 @@ Note:
     and validation rules.
 """
 
-from pydantic import BaseModel, Field, constr, ConfigDict
-
 from datetime import datetime
 from enum import Enum
-from typing import List, Optional
 from uuid import uuid4
+
+from pydantic import BaseModel, ConfigDict, Field, constr
 
 
 class FixityType(str, Enum):
@@ -68,6 +67,7 @@ class FixityType(str, Enum):
         Choice of algorithm should balance security needs with performance
         requirements. SHA256 is recommended for most use cases.
     """
+
     MD5 = "MD5"
     SHA1 = "SHA-1"
     SHA256 = "SHA-256"
@@ -106,6 +106,7 @@ class FixityModel(BaseModel):
         fixity.fixity_value = "new_value"  # Raises FrozenInstanceError
         ```
     """
+
     fixity_type: FixityType = Field(..., description="Type of the checksum algorithm.")
     fixity_value: constr(min_length=1) = Field(..., description="Checksum value.")
     file_id: str = Field(..., description="ID of the file this fixity belongs to")
@@ -165,16 +166,16 @@ class FileModel(BaseModel):
         references, which should be validated at the SIP level to ensure
         referential integrity.
     """
+
     file_id: str = Field(..., description="Unique identifier for the file")
     label: str = Field(..., description="Human-readable label")
     mime_type: str = Field(..., description="MIME type of the file")
     original_name: str = Field(..., description="Original filename")
-    original_path: Optional[str] = Field(None, description="Original file path")
+    original_path: str | None = Field(None, description="Original file path")
     size_bytes: int = Field(..., description="File size in bytes")
-    fixities: List[FixityModel] = Field(default_factory=list, description="File checksums")
-    dmd_ids: List[str] = Field(default_factory=list, description="Descriptive metadata IDs")
-    adm_ids: List[str] = Field(default_factory=list, description="Administrative metadata IDs")
-
+    fixities: list[FixityModel] = Field(default_factory=list, description="File checksums")
+    dmd_ids: list[str] = Field(default_factory=list, description="Descriptive metadata IDs")
+    adm_ids: list[str] = Field(default_factory=list, description="Administrative metadata IDs")
 
 
 class RepresentationType(str, Enum):
@@ -210,6 +211,7 @@ class RepresentationType(str, Enum):
         and access policies. Most Intellectual Entities should have at
         least a preservation and an access representation.
     """
+
     PRESERVATION = "preservation"
     ACCESS = "access"
     ORIGINAL = "original"
@@ -265,12 +267,16 @@ class RepresentationModel(BaseModel):
         - The usage_type helps determine appropriate preservation and
           access strategies
     """
-    rep_id: str = Field(default_factory=lambda: str(uuid4()), description="Unique identifier for the representation")
-    label: Optional[str] = Field(None, description="Human-readable label")
-    usage_type: Optional[RepresentationType] = Field(RepresentationType.ACCESS, description="Type of representation")
-    files: List[FileModel] = Field(default_factory=list, description="Files in this representation")
-    creation_date: Optional[datetime] = Field(None, description="Creation timestamp")
 
+    rep_id: str = Field(
+        default_factory=lambda: str(uuid4()), description="Unique identifier for the representation"
+    )
+    label: str | None = Field(None, description="Human-readable label")
+    usage_type: RepresentationType | None = Field(
+        RepresentationType.ACCESS, description="Type of representation"
+    )
+    files: list[FileModel] = Field(default_factory=list, description="Files in this representation")
+    creation_date: datetime | None = Field(None, description="Creation timestamp")
 
 
 class DublinCore(BaseModel):
@@ -329,11 +335,18 @@ class DublinCore(BaseModel):
         - Values should follow standard formatting where applicable
         - Additional Dublin Core elements can be added as needed
     """
-    title: List[str] = Field(default_factory=list, description="The name given to the resource")
-    creator: List[str] = Field(default_factory=list, description="An entity responsible for making the resource")
-    type: List[str] = Field(default_factory=list, description="The nature or genre of the resource")
-    identifier: List[str] = Field(default_factory=list, description="An unambiguous reference to the resource")
-    rights: List[str] = Field(default_factory=list, description="Information about rights held in and over the resource")
+
+    title: list[str] = Field(default_factory=list, description="The name given to the resource")
+    creator: list[str] = Field(
+        default_factory=list, description="An entity responsible for making the resource"
+    )
+    type: list[str] = Field(default_factory=list, description="The nature or genre of the resource")
+    identifier: list[str] = Field(
+        default_factory=list, description="An unambiguous reference to the resource"
+    )
+    rights: list[str] = Field(
+        default_factory=list, description="Information about rights held in and over the resource"
+    )
 
 
 class IEModel(BaseModel):
@@ -394,13 +407,14 @@ class IEModel(BaseModel):
         - Multiple representations allow for different use cases (preservation,
           access, etc.)
     """
+
     ie_id: str = Field(..., description="Unique identifier for the IE")
     dc: DublinCore = Field(..., description="Dublin Core metadata")
     ie_entity_type: str = Field(..., description="Type of intellectual entity")
-    representations: List[RepresentationModel] = Field(
-        default_factory=list,
-        description="Different representations of this IE"
+    representations: list[RepresentationModel] = Field(
+        default_factory=list, description="Different representations of this IE"
     )
+
 
 class SIPModel(BaseModel):
     """
@@ -460,12 +474,12 @@ class SIPModel(BaseModel):
         - The model ensures completeness for archival purposes
         - Submitting agent should be a system or organization identifier
     """
+
     sip_id: str = Field(..., description="Unique identifier for the SIP")
-    intellectual_entities: List[IEModel] = Field(
-        default_factory=list,
-        description="Intellectual entities in this SIP"
+    intellectual_entities: list[IEModel] = Field(
+        default_factory=list, description="Intellectual entities in this SIP"
     )
-    creation_date: Optional[datetime] = Field(None, description="SIP creation timestamp")
+    creation_date: datetime | None = Field(None, description="SIP creation timestamp")
     submitting_agent: str = Field(..., description="Agent responsible for SIP submission")
 
     model_config = ConfigDict(validate_assignment=True, extra="forbid")

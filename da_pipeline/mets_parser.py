@@ -1,541 +1,407 @@
 """
-METS XML Parser for OAIS-compliant SIP (Submission Information Package) objects.
+METS XML Parser for OAIS-compliant SIP objects.
 
-This module provides robust parsing of METS XML files into structured SIP objects,
-implementing OAIS (Open Archival Information System) standards and best practices
-for digital preservation metadata handling.
-
-Features:
-    - Full OAIS compliance with proper preservation metadata
-    - Complete Dublin Core metadata support (all 15 core elements)
-    - Robust XML parsing using ElementTree with proper namespace handling
-    - Comprehensive validation using Pydantic models
-    - UUID-based identifier management
-    - Proper timestamp handling with timezone support
-    - Detailed logging and error tracking
-    - Modular design independent of Dagster assets
-
-OAIS Compliance:
-    - Proper SIP structure with preservation metadata
-    - Complete Dublin Core metadata handling
-    - File fixity and technical metadata
-    - Preservation level tracking
-    - Representation management
-    - Agent and event tracking
-
-Data Validation:
-    - Required fields enforcement
-    - Data type validation
-    - Controlled vocabularies
-    - UUID validation
-    - DateTime format validation
-    - File fixity verification
-
-Usage:
-    try:
-        sip = parse_mets_to_sip("path/to/mets.xml")
-        print(f"Parsed SIP with ID: {sip.sip_id}")
-        print(f"Found {len(sip.intellectual_entities)} intellectual entities")
-        print(f"Preservation level: {sip.preservation_level}")
-    except METSParsingError as e:
-        print(f"Failed to parse METS file: {e}")
-
-The parser handles:
-    - Complete Dublin Core metadata in dmdSec elements
-    - Technical and preservation metadata in amdSec elements
-    - File characteristics and fixity information
-    - Representation grouping and properties
-    - Agent and event information
-    - Missing optional fields with proper defaults
-    - Malformed XML with detailed error messages
-
-Dependencies:
-    - xml.etree.ElementTree for XML parsing
-    - pydantic for data validation and modeling
-    - uuid for identifier management
-    - datetime for timestamp handling
-    - logging for error tracking
+Parses METS XML files into structured SIP models following OAIS standards.
+Supports Dublin Core metadata, PREMIS preservation metadata, and file fixity.
 """
-
-from pydantic import ValidationError
 
 import logging
 import xml.etree.ElementTree as Et
-from da_pipeline.pydantic_models import (
-    SIPModel, IEModel, RepresentationModel,
-    FileModel, FixityModel, FixityType,
-    RepresentationType, DublinCore
-)
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from pathlib import Path
-from typing import Dict, List, Optional, Tuple, Union
 from uuid import uuid4
 from xml.etree.ElementTree import Element
 
-# Configure logging
+from pydantic import ValidationError
+
+from da_pipeline.pydantic_models import (
+    DublinCore,
+    FileModel,
+    FixityModel,
+    FixityType,
+    IEModel,
+    RepresentationModel,
+    RepresentationType,
+    SIPModel,
+)
+
 logger = logging.getLogger(__name__)
 
-# XML Namespaces for METS and related standards
 NAMESPACES = {
     "mets": "http://www.loc.gov/METS/",
     "dc": "http://purl.org/dc/elements/1.1/",
     "dcterms": "http://purl.org/dc/terms/",
     "xlink": "http://www.w3.org/1999/xlink",
-    "xsi": "http://www.w3.org/2001/XMLSchema-instance",
     "premis": "http://www.loc.gov/premis/v3",
-    "dnx": "http://www.exlibrisgroup.com/dps/dnx",
-    "rights": "http://www.loc.gov/rights/",
-    "mix": "http://www.loc.gov/mix/v20"
 }
 
 
 class METSParsingError(Exception):
-    """
-    Custom exception for METS XML parsing errors.
+    """Raised when METS XML parsing fails."""
 
-    This exception is raised when encountering errors during the parsing
-    of METS (Metadata Encoding and Transmission Standard) XML files.
-    Common scenarios include:
-    - Invalid XML structure
-    - Missing required elements
-    - Malformed metadata sections
-    - Invalid or missing namespace declarations
-    """
     pass
 
 
-def safe_get_text(element: Optional[Element]) -> Optional[str]:
-    """Safely get text from an XML element.
-
-    Args:
-        element: The XML element to extract text from
-
-    Returns:
-        The text content if present, None otherwise
-    """
+def _get_text(element: Element | None) -> str | None:
+    """Extract stripped text from an XML element."""
     if element is not None and element.text:
         return element.text.strip()
     return None
 
 
-def parse_dc_metadata(dmd_sec: Element) -> DublinCore:
-    """Extract Dublin Core metadata from METS dmdSec.
+def _find_premis_object(element: Element) -> Element | None:
+    """Navigate to PREMIS object element within a metadata wrapper."""
+    md_wrap = element.find(".//mets:mdWrap", NAMESPACES)
+    if md_wrap is None:
+        return None
 
-    Args:
-        dmd_sec: XML element with DC metadata
+    mdtype = md_wrap.get("MDTYPE")
+    if mdtype not in ("PREMIS:OBJECT", "PREMIS"):
+        return None
 
-    Returns:
-        DublinCore: Model with title, creator, and rights metadata.
-                   Empty model if parsing fails.
+    xml_data = md_wrap.find(".//mets:xmlData", NAMESPACES)
+    if xml_data is None:
+        return None
 
-    Note:
-        Dates are parsed as ISO format, invalid dates are skipped.
-    """
-    dc_fields = {
-        "title": [], "creator": [], "subject": [], "description": [],
-        "publisher": [], "contributor": [], "date": [], "type": [],
-        "format": [], "identifier": [], "source": [], "language": [],
-        "relation": [], "coverage": [], "rights": []
-    }
-
-    try:
-        md_wrap = dmd_sec.find('mets:mdWrap', NAMESPACES)
-        xml_data = md_wrap.find('mets:xmlData', NAMESPACES) if md_wrap is not None else None
-        dc_record = xml_data.find('dc:record', NAMESPACES) if xml_data is not None else None
-
-        if dc_record is not None:
-            for field_name in dc_fields:
-                for element in dc_record.findall(f'dc:{field_name}', NAMESPACES):
-                    text = safe_get_text(element)
-                    if text:
-                        if field_name == "date":
-                            try:
-                                parsed_date = datetime.fromisoformat(text.replace('Z', '+00:00'))
-                                dc_fields[field_name].append(parsed_date)
-                            except ValueError:
-                                logger.warning(f"Skipping invalid date format: {text}")
-                        else:
-                            dc_fields[field_name].append(text)
-
-        return DublinCore(
-            title=dc_fields["title"],
-            creator=dc_fields["creator"],
-            rights=dc_fields["rights"]
-        )
-
-    except Exception as e:
-        logger.warning(f"Error parsing DC metadata: {e}, returning empty DC")
-        return DublinCore()
+    return xml_data.find(".//premis:object", NAMESPACES)
 
 
-def parse_dnx_section(element: Element, section_id: str) -> Dict[str, str]:
-    """Extract metadata from DNX section in amdSec.
+def _parse_premis_metadata(element: Element) -> dict[str, str]:
+    """Extract file metadata from a PREMIS object element."""
+    premis_obj = _find_premis_object(element)
+    if premis_obj is None:
+        return {}
 
-    Args:
-        element: XML element with DNX metadata sections
-        section_id: Section to parse (e.g., 'generalFileCharacteristics')
-
-    Returns:
-        Dict[str, str]: Metadata key-value pairs, empty dict if section not found
-
-    Raises:
-        METSParsingError: For malformed DNX section
-        ET.ParseError: For XML parsing errors
-    """
     result = {}
 
-    try:
-        logger.debug(f"Parsing DNX section {section_id}")
-        md_wrap = element.find('.//mets:mdWrap', NAMESPACES)
-        logger.debug(f"Found mdWrap: {md_wrap is not None}")
+    original_name = _get_text(premis_obj.find("premis:originalName", NAMESPACES))
+    if original_name:
+        result["fileOriginalName"] = original_name
+        result["label"] = original_name
 
-        if md_wrap is not None:
-            logger.debug(f"mdWrap OTHERMDTYPE: {md_wrap.get('OTHERMDTYPE')}")
-            if md_wrap.get('OTHERMDTYPE') == 'dnx':
-                xml_data = md_wrap.find('.//mets:xmlData', NAMESPACES)
-                logger.debug(f"Found xmlData: {xml_data is not None}")
+    obj_chars = premis_obj.find("premis:objectCharacteristics", NAMESPACES)
+    if obj_chars is not None:
+        size = _get_text(obj_chars.find("premis:size", NAMESPACES))
+        if size:
+            result["fileSize"] = size
 
-                if xml_data is not None:
-                    # Find DNX section using the correct namespace
-                    dnx_elem = xml_data.find('.//dnx:dnx', NAMESPACES)
-                    logger.debug(f"Found dnx element: {dnx_elem is not None}")
+        format_elem = obj_chars.find(".//premis:format", NAMESPACES)
+        if format_elem is not None:
+            format_name = _get_text(format_elem.find(".//premis:formatName", NAMESPACES))
+            if format_name:
+                result["fileMIMEType"] = format_name
 
-                    if dnx_elem is not None:
-                        section = dnx_elem.find(f'.//dnx:section[@id="{section_id}"]', NAMESPACES)
-                        logger.debug(f"Found section {section_id}: {section is not None}")
+        for fixity in obj_chars.findall("premis:fixity", NAMESPACES):
+            algorithm = _get_text(fixity.find("premis:messageDigestAlgorithm", NAMESPACES))
+            digest = _get_text(fixity.find("premis:messageDigest", NAMESPACES))
+            if algorithm and digest and "fixityType" not in result:
+                result["fixityType"] = algorithm
+                result["fixityValue"] = digest
 
-                        if section is not None:
-                            for record in section.findall('.//dnx:record', NAMESPACES):
-                                logger.debug("Processing record")
-                                for key_elem in record.findall('.//dnx:key', NAMESPACES):
-                                    key_id = key_elem.get('id')
-                                    if key_id:
-                                        value = safe_get_text(key_elem) or ""
-                                        logger.debug(f"Found key {key_id}: {value}")
-                                        result[key_id] = value
-    except Et.ParseError as e:
-        logger.error(f"Failed to parse DNX section {section_id}: {e}")
-        raise METSParsingError(f"Invalid DNX section structure: {e}")
+        creating_app = obj_chars.find("premis:creatingApplication", NAMESPACES)
+        if creating_app is not None:
+            date_created = _get_text(
+                creating_app.find("premis:dateCreatedByApplication", NAMESPACES)
+            )
+            if date_created:
+                result["fileCreationDate"] = date_created
+
+    storage = premis_obj.find(".//premis:storage", NAMESPACES)
+    if storage is not None:
+        content_loc = storage.find("premis:contentLocation", NAMESPACES)
+        if content_loc is not None:
+            loc_value = _get_text(content_loc.find("premis:contentLocationValue", NAMESPACES))
+            if loc_value:
+                result["fileOriginalPath"] = loc_value
+
+    pres_level = premis_obj.find("premis:preservationLevel", NAMESPACES)
+    if pres_level is not None:
+        pres_type = _get_text(pres_level.find("premis:preservationLevelType", NAMESPACES))
+        if pres_type:
+            result["preservationType"] = pres_type
+
+        pres_value = _get_text(pres_level.find("premis:preservationLevelValue", NAMESPACES))
+        if pres_value:
+            result["usageType"] = pres_value
+
+    for sig_prop in premis_obj.findall("premis:significantProperties", NAMESPACES):
+        prop_type = _get_text(sig_prop.find("premis:significantPropertiesType", NAMESPACES))
+        prop_value = _get_text(sig_prop.find("premis:significantPropertiesValue", NAMESPACES))
+        if prop_type and prop_value:
+            result[prop_type] = prop_value
 
     return result
 
 
-def parse_file_element(file_el: Element, amd_map: Dict[str, Dict[str, str]], root_el: Element = None) -> FileModel:
-    """Parse METS file element into FileModel with metadata.
+def _parse_premis_fixities(element: Element) -> list[dict[str, str]]:
+    """Extract all fixity records from a PREMIS object element."""
+    premis_obj = _find_premis_object(element)
+    if premis_obj is None:
+        return []
 
-    Args:
-        file_el: File XML element with technical metadata
-        amd_map: Administrative metadata mapping {amd_id: {key: value}}
-        root_el: Root METS element for cross-references (optional)
+    obj_chars = premis_obj.find("premis:objectCharacteristics", NAMESPACES)
+    if obj_chars is None:
+        return []
 
-    Returns:
-        FileModel: File info with metadata and fixity data
+    fixities = []
+    for fixity in obj_chars.findall("premis:fixity", NAMESPACES):
+        algorithm = _get_text(fixity.find("premis:messageDigestAlgorithm", NAMESPACES))
+        digest = _get_text(fixity.find("premis:messageDigest", NAMESPACES))
+        if algorithm and digest:
+            fixities.append({"fixityType": algorithm, "fixityValue": digest})
 
-    Raises:
-        METSParsingError: For invalid or missing attributes
-        ValueError: For invalid numeric values
-        KeyError: For missing metadata references
-    """
+    return fixities
+
+
+def _parse_dc_metadata(dmd_sec: Element) -> DublinCore:
+    """Extract Dublin Core metadata from a METS dmdSec element."""
+    md_wrap = dmd_sec.find("mets:mdWrap", NAMESPACES)
+    if md_wrap is None:
+        return DublinCore()
+
+    xml_data = md_wrap.find("mets:xmlData", NAMESPACES)
+    if xml_data is None:
+        return DublinCore()
+
+    dc_record = xml_data.find("dc:record", NAMESPACES)
+    if dc_record is None:
+        return DublinCore()
+
+    def collect_field(field_name: str) -> list[str]:
+        return [
+            text
+            for el in dc_record.findall(f"dc:{field_name}", NAMESPACES)
+            if (text := _get_text(el))
+        ]
+
+    return DublinCore(
+        title=collect_field("title"),
+        creator=collect_field("creator"),
+        rights=collect_field("rights"),
+    )
+
+
+def _parse_file_element(
+    file_el: Element,
+    amd_map: dict[str, dict[str, str]],
+    root: Element,
+) -> FileModel:
+    """Parse a METS file element into a FileModel with fixity data."""
+    file_id = file_el.get("ID", str(uuid4()))
+    file_dmdid = file_el.get("DMDID", "")
+    file_admid = file_el.get("ADMID", "")
+    file_data = amd_map.get(file_admid, {})
+
+    size_bytes = 0
     try:
-        file_id = file_el.get('ID', str(uuid4()))
-        file_dmdid = file_el.get('DMDID', '')
-        file_admid = file_el.get('ADMID', '')
-        file_data = amd_map.get(file_admid, {})
+        size_bytes = int(file_data.get("fileSize", 0))
+    except (ValueError, TypeError):
+        logger.warning(f"Invalid file size for {file_id}, using 0")
 
-        # Get metadata with defaults
-        label = file_data.get('label', file_id)
-        mime_type = file_data.get('fileMIMEType', 'application/octet-stream')
-        original_name = file_data.get('fileOriginalName', file_id)
-        size_bytes = 0
+    file_model = FileModel(
+        file_id=file_id,
+        label=file_data.get("label", file_id),
+        mime_type=file_data.get("fileMIMEType", "application/octet-stream"),
+        original_name=file_data.get("fileOriginalName", file_id),
+        original_path=file_data.get("fileOriginalPath"),
+        size_bytes=size_bytes,
+        dmd_ids=file_dmdid.split(),
+        adm_ids=file_admid.split(),
+    )
 
-        try:
-            size_bytes = int(file_data.get('fileSize', 0))
-        except (ValueError, TypeError):
-            logger.warning(f"Invalid file size value for file {file_id}, using 0")
-
-        # Create file model with minimal fields
-        file_model = FileModel(
-            file_id=file_id,
-            label=label,
-            mime_type=mime_type,
-            original_name=original_name,
-            original_path=file_data.get('fileOriginalPath'),
-            size_bytes=size_bytes,
-            dmd_ids=file_dmdid.split(),
-            adm_ids=file_admid.split()
-        )
-
-        # Parse fixity information from fileFixity section in amdSec
-        fixities = []
-        if root_el is not None and file_admid:
-            # Find the amdSec element referenced by file_admid
-            amd_sec = root_el.find(f'.//mets:amdSec[@ID="{file_admid}"]', NAMESPACES)
-            if amd_sec is not None:
-                tech_md = amd_sec.find('.//mets:techMD', NAMESPACES)
-                if tech_md is not None:
-                    file_fixity_section = parse_dnx_section(tech_md, 'fileFixity')
-                    if file_fixity_section:
-                        try:
-                            fix_type = FixityType(file_fixity_section.get('fixityType', '').upper())
-                            fix_value = file_fixity_section.get('fixityValue')
-                            if fix_value:
-                                fixities.append(FixityModel(
-                                    fixity_type=fix_type,
-                                    fixity_value=fix_value,
-                                    file_id=file_id
-                                ))
-                        except (ValueError, AttributeError) as e:
-                            logger.warning(f"Invalid fixity data for file {file_id}: {e}")
-
-        file_model.fixities = fixities
-
-        return file_model
-
-    except ValidationError as e:
-        logger.error(f"File model validation failed: {e}")
-        raise METSParsingError(f"File model validation failed: {e}")
-    except Exception as e:
-        logger.error(f"Unexpected error parsing file element: {e}")
-        raise METSParsingError(f"Unexpected error parsing file element: {e}")
-
-
-
-
-def extract_sip_metadata(root: Element, xml_path: Union[str, Path]) -> Tuple[str, str]:
-    """Get SIP ID and submitting agent from METS.
-
-    Args:
-        root: METS XML root
-        xml_path: XML file path (for default SIP ID)
-
-    Returns:
-        (str, str): SIP ID and submitting agent
-    """
-    sip_id = root.get('OBJID', f"SIP-{Path(xml_path).stem}")
-
-    header = root.find('mets:metsHdr', NAMESPACES)
-    submitting_agent = "Unknown"
-    if header is not None:
-        agent = header.find('.//mets:agent[@ROLE="CREATOR"]', NAMESPACES)
-        if agent is not None:
-            submitting_agent = safe_get_text(agent.find('.//mets:name', NAMESPACES)) or "Unknown"
-
-    return sip_id, submitting_agent
-
-
-def parse_metadata_sections(root: Element) -> Tuple[Dict[str, DublinCore], Dict[str, Dict[str, str]]]:
-    """Extract metadata from METS XML.
-
-    Args:
-        root: METS XML root element
-
-    Returns:
-        (Dict[str, DublinCore], Dict[str, Dict[str, str]]): 
-        Descriptive and administrative metadata mappings
-    """
-    # Parse all dmdSec elements
-    dmd_map: Dict[str, DublinCore] = {}
-    for dmd_sec in root.findall('mets:dmdSec', NAMESPACES):
-        dmd_id = dmd_sec.get('ID')
-        if dmd_id:
-            dmd_map[dmd_id] = parse_dc_metadata(dmd_sec)
-
-    # Parse all amdSec elements
-    amd_map: Dict[str, Dict[str, str]] = {}
-    for amd_sec in root.findall('mets:amdSec', NAMESPACES):
-        amd_id = amd_sec.get('ID')
-        if amd_id:
-            tech_md = amd_sec.find('mets:techMD', NAMESPACES)
+    if file_admid:
+        amd_sec = root.find(f'.//mets:amdSec[@ID="{file_admid}"]', NAMESPACES)
+        if amd_sec is not None:
+            tech_md = amd_sec.find(".//mets:techMD", NAMESPACES)
             if tech_md is not None:
-                # Parse file characteristics and fixity
-                file_chars = parse_dnx_section(tech_md, 'generalFileCharacteristics')
-                fixity = parse_dnx_section(tech_md, 'fileFixity')
-                amd_map[amd_id] = {**file_chars, **fixity}
+                file_model.fixities = _build_fixity_models(tech_md, file_id)
+
+    return file_model
+
+
+def _build_fixity_models(tech_md: Element, file_id: str) -> list[FixityModel]:
+    """Convert PREMIS fixity data into FixityModel instances."""
+    fixities = []
+    for fix_data in _parse_premis_fixities(tech_md):
+        try:
+            fix_type = FixityType(fix_data["fixityType"].upper())
+            fix_value = fix_data.get("fixityValue")
+            if fix_value:
+                fixities.append(
+                    FixityModel(
+                        fixity_type=fix_type,
+                        fixity_value=fix_value,
+                        file_id=file_id,
+                    )
+                )
+        except (ValueError, KeyError) as e:
+            logger.warning(f"Invalid fixity data for file {file_id}: {e}")
+    return fixities
+
+
+def _determine_representation_type(pres_type: str) -> RepresentationType:
+    """Map PREMIS preservation level type to RepresentationType."""
+    pres_type_upper = pres_type.upper()
+    if pres_type_upper in ("PRESERVATION_MASTER", "PRESERVATION"):
+        return RepresentationType.PRESERVATION
+    if pres_type_upper in ("DERIVATIVE_COPY", "ACCESS", "DERIVATIVE"):
+        return RepresentationType.ACCESS
+    if pres_type_upper in ("ORIGINAL", "SUBMISSION"):
+        return RepresentationType.ORIGINAL
+    return RepresentationType.ACCESS
+
+
+def _parse_metadata_sections(
+    root: Element,
+) -> tuple[dict[str, DublinCore], dict[str, dict[str, str]]]:
+    """Extract descriptive and administrative metadata from METS."""
+    dmd_map = {}
+    for dmd_sec in root.findall("mets:dmdSec", NAMESPACES):
+        dmd_id = dmd_sec.get("ID")
+        if dmd_id:
+            dmd_map[dmd_id] = _parse_dc_metadata(dmd_sec)
+
+    amd_map = {}
+    for amd_sec in root.findall("mets:amdSec", NAMESPACES):
+        amd_id = amd_sec.get("ID")
+        if amd_id:
+            tech_md = amd_sec.find("mets:techMD", NAMESPACES)
+            if tech_md is not None:
+                amd_map[amd_id] = _parse_premis_metadata(tech_md)
 
     return dmd_map, amd_map
 
 
-def process_file_sections(root: Element, amd_map: Dict[str, Dict[str, str]]) -> List[RepresentationModel]:
-    """Extract file sections into representation models.
+def _process_file_sections(
+    root: Element, amd_map: dict[str, dict[str, str]]
+) -> list[RepresentationModel]:
+    """Extract file groups into representation models."""
+    file_sec = root.find("mets:fileSec", NAMESPACES)
+    if file_sec is None:
+        return []
 
-    Args:
-        root: METS XML root
-        amd_map: Technical metadata mapping
+    representations = []
+    for file_grp in file_sec.findall("mets:fileGrp", NAMESPACES):
+        rep_id = file_grp.get("ID", "rep-unknown")
+        admid = file_grp.get("ADMID", "")
 
-    Returns:
-        List[RepresentationModel]: Representations with associated files
-    """
-    file_sec = root.find('mets:fileSec', NAMESPACES)
-    representation_list = []
+        rep_data = _get_representation_metadata(root, admid)
+        usage_type = _determine_representation_type(rep_data.get("preservationType", ""))
 
-    if file_sec is not None:
-        for file_grp in file_sec.findall('mets:fileGrp', NAMESPACES):
-            rep_id = file_grp.get('ID', 'rep-unknown')
-            admid = file_grp.get('ADMID', '')
+        rep_model = RepresentationModel(
+            rep_id=rep_id,
+            label=rep_data.get("label") or f"Representation {rep_id}",
+            usage_type=usage_type,
+            creation_date=datetime.now(UTC),
+        )
 
-            # Get representation metadata from DNX section
-            tech_md = None
-            for amd_sec in root.findall('.//mets:amdSec[@ID="' + admid + '"]', NAMESPACES):
-                tech_md = amd_sec.find('.//mets:techMD', NAMESPACES)
-                if tech_md is not None:
-                    break
-
-            rep_data = {}
-            if tech_md is not None:
-                rep_chars = parse_dnx_section(tech_md, 'generalRepCharacteristics')
-                rep_data = {
-                    'label': rep_chars.get('label'),
-                    'usageType': rep_chars.get('usageType')
-                }
-
-            # Parse usage type
-            usage_type_str = rep_data.get('usageType', '').lower()
+        for file_el in file_grp.findall("mets:file", NAMESPACES):
             try:
-                usage_type = RepresentationType(usage_type_str)
-            except ValueError:
-                logger.warning(
-                    f"Invalid usage type '{usage_type_str}' for representation {rep_id}, defaulting to 'access'")
-                usage_type = RepresentationType.ACCESS
+                rep_model.files.append(_parse_file_element(file_el, amd_map, root))
+            except (METSParsingError, ValidationError) as e:
+                logger.error(f"Failed to parse file in representation {rep_id}: {e}")
 
-            # Get label or generate one
-            label = rep_data.get('label') or f"Representation {rep_id}"
+        if rep_model.files:
+            representations.append(rep_model)
+        else:
+            logger.warning(f"Skipping representation {rep_id}: no valid files")
 
-            # Get creation date or use current time
-            try:
-                creation_date_str = rep_data.get('creationDate')
-                creation_date = datetime.fromisoformat(
-                    creation_date_str.replace('Z', '+00:00')) if creation_date_str else datetime.now(timezone.utc)
-            except (ValueError, AttributeError):
-                logger.warning(f"Invalid creation date for representation {rep_id}, using current time")
-                creation_date = datetime.now(timezone.utc)
-
-            rep_model = RepresentationModel(
-                rep_id=rep_id,
-                label=label,
-                usage_type=usage_type,
-                creation_date=creation_date
-            )
-
-            # Parse files in this representation
-            for file_el in file_grp.findall('mets:file', NAMESPACES):
-                try:
-                    file_model = parse_file_element(file_el, amd_map, root)
-                    rep_model.files.append(file_model)
-                except METSParsingError as e:
-                    logger.error(f"Failed to parse file in representation {rep_id}: {e}")
-                    continue
-
-            # Validate that representation has at least one file
-            if rep_model.files:
-                representation_list.append(rep_model)
-            else:
-                logger.warning(f"Skipping representation {rep_id} as it contains no valid files")
-
-    return representation_list
+    return representations
 
 
-def build_ie_model(sip_id: str, dmd_map: Dict[str, DublinCore], amd_map: Dict[str, Dict[str, str]], 
-                          representations: List[RepresentationModel]) -> IEModel:
-    """Create IEModel from metadata and representations.
+def _get_representation_metadata(root: Element, admid: str) -> dict[str, str]:
+    """Get PREMIS metadata for a representation by its ADMID."""
+    if not admid:
+        return {}
 
-    Args:
-        sip_id: SIP ID for IE ID generation
-        dmd_map: Dublin Core metadata
-        amd_map: Administrative metadata
-        representations: Representation models
+    amd_sec = root.find(f'.//mets:amdSec[@ID="{admid}"]', NAMESPACES)
+    if amd_sec is None:
+        return {}
 
-    Returns:
-        IEModel: Populated model
+    tech_md = amd_sec.find(".//mets:techMD", NAMESPACES)
+    if tech_md is None:
+        return {}
 
-    Raises:
-        METSParsingError: If required metadata missing
-    """
-    try:
-        ie_dmd_data = dmd_map["ie-dmd"]
-    except KeyError:
-        logger.error("No ie-dmd section found in METS file")
+    premis_data = _parse_premis_metadata(tech_md)
+    return {
+        "label": premis_data.get("label"),
+        "preservationType": premis_data.get("preservationType"),
+    }
+
+
+def _build_ie_model(
+    sip_id: str,
+    dmd_map: dict[str, DublinCore],
+    amd_map: dict[str, dict[str, str]],
+    representations: list[RepresentationModel],
+) -> IEModel:
+    """Create an IEModel from metadata and representations."""
+    if "ie-dmd" not in dmd_map:
         raise METSParsingError("Missing required ie-dmd section")
 
+    ie_dmd_data = dmd_map["ie-dmd"]
     if not any([ie_dmd_data.title, ie_dmd_data.identifier, ie_dmd_data.type]):
-        logger.error("Required Dublin Core metadata fields are empty")
         raise METSParsingError("Missing required Dublin Core metadata")
 
-    # Generate IE ID
-    ie_id_str = sip_id.replace('SIP-', 'IE-')
-
-    # Set default values for administrative metadata
-    ie_entity_type = 'unknown'
-
-    # Try to get administrative metadata if available
+    ie_id = sip_id.replace("SIP-", "IE-")
     ie_amd_data = amd_map.get("ie-amd", {})
-    if ie_amd_data and 'IEEntityType' in ie_amd_data:
-        ie_entity_type = ie_amd_data['IEEntityType']
 
-    # Create Dublin Core metadata model
     dc_model = DublinCore(
-        title=ie_dmd_data.title if ie_dmd_data.title else ["Untitled"],
-        identifier=ie_dmd_data.identifier if ie_dmd_data.identifier else [ie_id_str],
+        title=ie_dmd_data.title or ["Untitled"],
+        identifier=ie_dmd_data.identifier or [ie_id],
         creator=ie_dmd_data.creator,
-        rights=ie_dmd_data.rights
+        rights=ie_dmd_data.rights,
     )
 
-    # Create and return IE model
     return IEModel(
-        ie_id=ie_id_str,
+        ie_id=ie_id,
         dc=dc_model,
-        ie_entity_type=ie_entity_type,
-        representations=representations
+        ie_entity_type=ie_amd_data.get("IEEntityType", "unknown"),
+        representations=representations,
     )
 
 
-def parse_mets_to_sip(xml_path: Union[str, Path]) -> SIPModel:
-    """Parse METS XML file into a validated SIP model.
+def _extract_sip_metadata(root: Element, xml_path: str | Path) -> tuple[str, str]:
+    """Extract SIP ID and submitting agent from METS header."""
+    sip_id = root.get("OBJID", f"SIP-{Path(xml_path).stem}")
 
-    Args:
-        xml_path: Path to METS XML file
+    submitting_agent = "Unknown"
+    header = root.find("mets:metsHdr", NAMESPACES)
+    if header is not None:
+        agent = header.find('.//mets:agent[@ROLE="CREATOR"]', NAMESPACES)
+        if agent is not None:
+            submitting_agent = _get_text(agent.find(".//mets:name", NAMESPACES)) or "Unknown"
 
-    Returns:
-        SIPModel: OAIS-compliant SIP with metadata and file information
+    return sip_id, submitting_agent
 
-    Raises:
-        METSParsingError: For structural or validation errors
-        ValidationError: For invalid model data
-        FileNotFoundError: If file doesn't exist
-        PermissionError: If file can't be read
+
+def parse_mets_to_sip(xml_path: str | Path) -> SIPModel:
     """
-    logger.info(f"Starting to parse METS file: {xml_path}")
+    Parse a METS XML file into a validated SIP model.
+
+    Raises METSParsingError for structural or validation errors.
+    """
+    logger.info(f"Parsing METS file: {xml_path}")
 
     try:
         tree = Et.parse(xml_path)
         root = tree.getroot()
-    except (Et.ParseError, IOError) as e:
-        logger.error(f"Failed to parse XML file {xml_path}: {e}")
-        raise METSParsingError(f"Failed to parse XML file: {e}")
+    except (OSError, Et.ParseError) as e:
+        raise METSParsingError(f"Failed to parse XML file: {e}") from e
 
     try:
-        # Extract SIP metadata
-        sip_id_str, submitting_agent = extract_sip_metadata(root, xml_path)
+        sip_id, submitting_agent = _extract_sip_metadata(root, xml_path)
+        dmd_map, amd_map = _parse_metadata_sections(root)
+        representations = _process_file_sections(root, amd_map)
+        ie_model = _build_ie_model(sip_id, dmd_map, amd_map, representations)
 
-        # Initialize SIP model with minimal required fields
-        sip_model = SIPModel(
-            sip_id=sip_id_str,
+        return SIPModel(
+            sip_id=sip_id,
             submitting_agent=submitting_agent,
-            creation_date=datetime.now(timezone.utc),
-            intellectual_entities=[]  # Will be populated later
+            creation_date=datetime.now(UTC),
+            intellectual_entities=[ie_model],
         )
-        # Parse metadata sections
-        dmd_map, amd_map = parse_metadata_sections(root)
-
-        # Process file sections
-        representation_list = process_file_sections(root, amd_map)
-
-        # Build and add IE model
-        ie_model = build_ie_model(sip_id_str, dmd_map, amd_map, representation_list)
-        sip_model.intellectual_entities.append(ie_model)
-
-        logger.info(f"Successfully parsed METS file {xml_path}")
-        return sip_model
-
+    except METSParsingError:
+        raise
     except Exception as e:
-        logger.error(f"Unexpected error while parsing METS file: {e}")
-        raise METSParsingError(f"Failed to parse METS structure: {e}")
+        raise METSParsingError(f"Failed to parse METS structure: {e}") from e

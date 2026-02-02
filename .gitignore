@@ -16,3 +16,7 @@
 
 # Python build directories
 /da_pipeline.egg-info/
+
+# Dagster
+.dagster/
+.tmp_dagster_home_*/

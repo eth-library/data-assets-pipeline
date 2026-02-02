@@ -4,6 +4,9 @@
 # Devbox environment
 .devbox/
 
+# direnv
+.direnv/
+
 # Environment variables
 .env
 

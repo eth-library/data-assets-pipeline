@@ -33,18 +33,17 @@ Usage:
 from pathlib import Path
 
 from dagster import (
-    RunRequest,
-    sensor,
+    ConfigurableResource,
+    DefaultSensorStatus,
     RunConfig,
+    RunRequest,
+    SensorEvaluationContext,
     SkipReason,
     define_asset_job,
-    DefaultSensorStatus,
-    ConfigurableResource,
-    SensorEvaluationContext,
+    sensor,
 )
 
 from .assets import all_assets
-
 
 # Define the asset materialization job that processes METS XML files into SIPs
 # This job ensures all assets are processed in the correct dependency order
@@ -70,13 +69,11 @@ class TestDataPathResource(ConfigurableResource):
         - Local dev: Uses default path relative to source
         - K8s: Set DAGSTER_TEST_DATA_PATH=/da_pipeline_tests/test_data
     """
+
     path: str
 
-@sensor(
-    job=ingest_sip_job,
-    minimum_interval_seconds=30,
-    default_status=DefaultSensorStatus.RUNNING
-)
+
+@sensor(job=ingest_sip_job, minimum_interval_seconds=30, default_status=DefaultSensorStatus.RUNNING)
 def xml_file_sensor(
     context: SensorEvaluationContext,
     test_data_path: TestDataPathResource,
@@ -106,12 +103,6 @@ def xml_file_sensor(
         yield RunRequest(
             run_key=f"xml_file_{xml_file.name}",
             run_config=RunConfig(
-                ops={
-                    "sip_asset": {
-                        "config": {
-                            "file_paths": [str(xml_file.absolute())]
-                        }
-                    }
-                }
-            )
+                ops={"sip_asset": {"config": {"file_paths": [str(xml_file.absolute())]}}}
+            ),
         )

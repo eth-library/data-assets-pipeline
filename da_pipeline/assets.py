@@ -1,19 +1,19 @@
 # dagster_sip/assets.py
 
-from typing import Dict, List
-from dagster import asset, Output, MetadataValue
+from dagster import MetadataValue, Output, asset
+
 from da_pipeline.mets_parser import parse_mets_to_sip
 from da_pipeline.pydantic_models import (
-    SIPModel, IEModel, RepresentationModel,
-    FileModel, FixityModel
+    FileModel,
+    FixityModel,
+    IEModel,
+    RepresentationModel,
+    SIPModel,
 )
 from da_pipeline.utils import collect_dc_metadata, collect_fixity_details, group_fixities_by_file
 
-@asset(
-    config_schema={
-        "file_paths": [str]
-    }
-)
+
+@asset(config_schema={"file_paths": [str]})
 def sip_asset(context) -> Output[SIPModel]:
     """
     Parses one or more METS XML files into a structured SIP (Submission Information Package) model.
@@ -52,13 +52,12 @@ def sip_asset(context) -> Output[SIPModel]:
             "SIP ID": MetadataValue.text(primary_sip.sip_id),
             "Intellectual Entity Count": MetadataValue.int(len(primary_sip.intellectual_entities)),
             "IE IDs": MetadataValue.json(all_ie_ids),
-        }
+        },
     )
 
 
-
 @asset
-def intellectual_entities(sip_asset: SIPModel) -> Output[List[IEModel]]:
+def intellectual_entities(sip_asset: SIPModel) -> Output[list[IEModel]]:
     """Extract and process Intellectual Entity models from a SIP.
 
     Args:
@@ -70,13 +69,11 @@ def intellectual_entities(sip_asset: SIPModel) -> Output[List[IEModel]]:
     ie_list = sip_asset.intellectual_entities
     metadata = collect_dc_metadata(ie_list)
 
-    return Output(
-        value=ie_list,
-        metadata=metadata
-    )
+    return Output(value=ie_list, metadata=metadata)
+
 
 @asset
-def representations(intellectual_entities: List[IEModel]) -> Output[List[RepresentationModel]]:
+def representations(intellectual_entities: list[IEModel]) -> Output[list[RepresentationModel]]:
     """
     Collects and processes all representations from a list of Intellectual Entities.
     A representation is a specific form of the intellectual content
@@ -93,7 +90,7 @@ def representations(intellectual_entities: List[IEModel]) -> Output[List[Represe
                 - Representation Count: Total number of representations
                 - Representation IDs: List of unique representation identifiers
     """
-    reps: List[RepresentationModel] = []
+    reps: list[RepresentationModel] = []
     for ie in intellectual_entities:
         reps.extend(ie.representations)
 
@@ -105,11 +102,12 @@ def representations(intellectual_entities: List[IEModel]) -> Output[List[Represe
         metadata={
             "Representation Count": MetadataValue.int(len(reps)),
             "Representation IDs": MetadataValue.json(rep_ids),
-        }
+        },
     )
 
+
 @asset
-def files(representations: List[RepresentationModel]) -> Output[List[FileModel]]:
+def files(representations: list[RepresentationModel]) -> Output[list[FileModel]]:
     """
     Extracts and processes all files from a list of representations.
     Collects file information including original names where available.
@@ -125,7 +123,7 @@ def files(representations: List[RepresentationModel]) -> Output[List[FileModel]]
                 - File Count: Total number of files across all representations
                 - File Original Names: List of original filenames (excluding None values)
     """
-    all_files: List[FileModel] = []
+    all_files: list[FileModel] = []
     for rep in representations:
         all_files.extend(rep.files)
 
@@ -137,12 +135,12 @@ def files(representations: List[RepresentationModel]) -> Output[List[FileModel]]
         metadata={
             "File Count": MetadataValue.int(len(all_files)),
             "File Original Names": MetadataValue.json(file_names),
-        }
+        },
     )
 
 
 @asset
-def fixities(files: List[FileModel]) -> Output[List[FixityModel]]:
+def fixities(files: list[FileModel]) -> Output[list[FixityModel]]:
     """Extract and process file fixity (checksum) information.
 
     Args:
@@ -153,7 +151,7 @@ def fixities(files: List[FileModel]) -> Output[List[FixityModel]]:
         fixity counts and organization by file
     """
     # Collect all fixities
-    all_fixities: List[FixityModel] = []
+    all_fixities: list[FixityModel] = []
     for f in files:
         all_fixities.extend(f.fixities)
 
@@ -168,8 +166,9 @@ def fixities(files: List[FileModel]) -> Output[List[FixityModel]]:
             "Fixity Count": MetadataValue.int(len(all_fixities)),
             "Fixities by File": MetadataValue.json(fixities_by_file),
             "All Fixities": MetadataValue.json(fixity_details),
-        }
+        },
     )
+
 
 # Load all assets from this module
 all_assets = [

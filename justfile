@@ -53,6 +53,16 @@ dev:
 test *ARGS:
     pytest da_pipeline_tests {{ ARGS }}
 
+# Lint code (check only)
+lint:
+    ruff check da_pipeline da_pipeline_tests
+    ruff format --check da_pipeline da_pipeline_tests
+
+# Format and fix code
+fmt:
+    ruff check --fix da_pipeline da_pipeline_tests
+    ruff format da_pipeline da_pipeline_tests
+
 # ═══════════════════════════════════════════════════════════════════════════════
 # Kubernetes (k8s-*)
 # ═══════════════════════════════════════════════════════════════════════════════

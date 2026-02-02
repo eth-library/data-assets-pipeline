@@ -8,6 +8,7 @@ the processing workflow when files are detected.
 Components:
     - xml_file_sensor: Monitors test_data directory for XML files
     - ingest_sip_job: Job definition for processing detected files
+    - TestDataPathResource: ConfigurableResource for test data path
 
 Configuration:
     - Monitoring interval: 30 seconds
@@ -29,42 +30,72 @@ Usage:
     ```
 """
 
+from pathlib import Path
+
 from dagster import (
     RunRequest,
     sensor,
     RunConfig,
     SkipReason,
     define_asset_job,
-    DefaultSensorStatus
+    DefaultSensorStatus,
+    ConfigurableResource,
+    SensorEvaluationContext,
 )
 
-from pathlib import Path
 from .assets import all_assets
+
 
 # Define the asset materialization job that processes METS XML files into SIPs
 # This job ensures all assets are processed in the correct dependency order
+# Config is provided by the sensor, or via the Dagster UI launchpad for manual runs
 ingest_sip_job = define_asset_job(
     "ingest_sip_job",
-    selection=all_assets,  # Include all assets from the pipeline
+    selection=all_assets,
 )
 
-TEST_DATA_PATH = Path(__file__).parent.parent / "da_pipeline_tests" / "test_data"
+# Default test data path for local development (relative to source)
+_default_test_data_path = str(Path(__file__).parent.parent / "da_pipeline_tests" / "test_data")
+
+
+class TestDataPathResource(ConfigurableResource):
+    """
+    Resource providing the test data directory path.
+
+    Uses EnvVar so the environment variable is resolved at runtime rather than
+    code load time. This is important for K8s deployments where the env var
+    may differ between the code server and run pods.
+
+    Configuration:
+        - Local dev: Uses default path relative to source
+        - K8s: Set DAGSTER_TEST_DATA_PATH=/da_pipeline_tests/test_data
+    """
+    path: str
 
 @sensor(
     job=ingest_sip_job,
     minimum_interval_seconds=30,
     default_status=DefaultSensorStatus.RUNNING
 )
-def xml_file_sensor():
+def xml_file_sensor(
+    context: SensorEvaluationContext,
+    test_data_path: TestDataPathResource,
+):
     """
     Monitors the test_data directory for XML files and triggers asset materialization.
+
+    Args:
+        context: Sensor evaluation context provided by Dagster.
+        test_data_path: Resource providing the test data directory path.
     """
-    if not TEST_DATA_PATH.exists():
-        yield SkipReason(f"Test data directory {TEST_DATA_PATH} does not exist")
+    data_path = Path(test_data_path.path)
+
+    if not data_path.exists():
+        yield SkipReason(f"Test data directory {data_path} does not exist")
         return
 
     # Get all XML files in the directory
-    xml_files = [f for f in TEST_DATA_PATH.glob("*.xml")]
+    xml_files = [f for f in data_path.glob("*.xml")]
 
     if not xml_files:
         yield SkipReason("No XML files found in the test data directory")

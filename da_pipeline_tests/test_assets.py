@@ -19,7 +19,7 @@ def mets_file_path():
     return os.path.join(
         os.path.dirname(__file__),
         "test_data",
-        "ie.xml"
+        "synthetic_sip.xml"
     )
 
 

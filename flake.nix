@@ -1,13 +1,7 @@
 {
   description = "Development environment for da_pipeline using Nix, uv, and .venv";
 
-  # Define inputs with pinned versions for reproducibility
-  inputs = {
-    # Use the NixOS 24.11 “stable” branch
-    nixpkgs.url = "github:NixOS/nixpkgs/nixos-24.11";
-    # flake-utils provides helper functions for working with flakes
-    flake-utils.url = "github:numtide/flake-utils";
-  };
+  inputs.nixpkgs.url = "github:NixOS/nixpkgs/nixos-25.11";
 
   outputs = { self, nixpkgs, flake-utils, ... }:
     flake-utils.lib.eachDefaultSystem (system:

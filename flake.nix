@@ -13,8 +13,10 @@
         default = pkgs.mkShell {
           packages = [
             pkgs.python312
-            pkgs.python312Packages.hatchling
-            pkgs.uv  # Modern Python package manager and installer
+            pkgs.uv
+            pkgs.kubectl
+            pkgs.kubernetes-helm
+            pkgs.just
           ];
         };
       });

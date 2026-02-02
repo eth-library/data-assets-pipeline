@@ -1,11 +1,11 @@
-from dagster import Definitions, load_assets_from_modules, EnvVar
+from dagster import Definitions, EnvVar, load_assets_from_modules
 
 from da_pipeline import assets
 from da_pipeline.sensors import (
-    xml_file_sensor,
-    ingest_sip_job,
     TestDataPathResource,
     _default_test_data_path,
+    ingest_sip_job,
+    xml_file_sensor,
 )
 
 all_assets = load_assets_from_modules([assets])

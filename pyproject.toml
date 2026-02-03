@@ -19,6 +19,9 @@ dependencies = [
   "data-archive-models>=0.1.0a2.dev",
 ]
 
+[project.urls]
+Repository = "https://github.com/eth-library/data-assets-pipeline"
+
 [project.optional-dependencies]
 dev = [
   "pytest>=8.3.5",

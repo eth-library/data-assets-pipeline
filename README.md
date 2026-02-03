@@ -251,32 +251,34 @@ helm/                        # Kubernetes configuration
 
 ## Dependency Management
 
-Dependencies are managed using [UV](https://github.com/astral-sh/uv), a modern Python package manager:
+Dependencies are managed with [uv](https://github.com/astral-sh/uv):
 
-- `pyproject.toml`: Defines project dependencies (requires Python 3.12+)
-- `uv.lock`: Locks dependencies to specific versions
-
-Common UV commands:
+Install or update dependencies:
 
 ```bash
-# Update dependencies
 uv sync
-
-# Update lock file
-uv lock
-
-# Install dependencies (for manual setup)
-uv install
 ```
 
-## Usage
-
-### Starting the Dagster UI
-
-Launch the Dagster web interface:
+Update the lock file:
 
 ```bash
-dagster dev
+uv lock
+```
+
+Add a new dependency:
+
+```bash
+uv add <package>
+```
+
+## Troubleshooting
+
+### Dagster UI not loading
+
+Ensure no other process is using port 3000 (local) or 8080 (Kubernetes):
+
+```bash
+lsof -i :3000
 ```
 
 Access the UI at http://localhost:3000

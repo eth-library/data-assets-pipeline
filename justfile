@@ -142,7 +142,6 @@ k8s-ui:
     (kubectl port-forward svc/dagster-dagster-webserver 8080:80 -n {{ namespace }} &>/dev/null &)
 
     echo "Waiting for webserver to start..."
-    attempt=1
     while true; do
         if curl -s -o /dev/null -w '' --connect-timeout 1 http://localhost:8080 2>/dev/null; then
             echo ""

@@ -281,31 +281,26 @@ Ensure no other process is using port 3000 (local) or 8080 (Kubernetes):
 lsof -i :3000
 ```
 
-Access the UI at http://localhost:3000
+### Kubernetes deployment fails
 
-### Pipeline Structure
-
-The pipeline consists of the following components:
-
-1. **Assets**:
-   - `sip_asset`: Parses METS XML files into a structured SIP model
-   - `intellectual_entities`: Extracts and processes Intellectual Entity models
-   - `representations`: Collects and processes file representations
-   - `files`: Extracts and processes file metadata
-   - `fixities`: Extracts and processes file checksums
-
-2. **Jobs**:
-   - `ingest_sip_job`: Orchestrates the complete SIP creation process
-
-3. **Sensors**:
-   - `xml_file_sensor`: Monitors for new METS XML files and triggers processing
-
-### Running Tests
-
-Execute the test suite:
+Verify Kubernetes is running:
 
 ```bash
-pytest da_pipeline_tests
+kubectl cluster-info
+```
+
+Ensure Docker Desktop Kubernetes is enabled in Settings → Kubernetes → Enable Kubernetes.
+
+### Sensor not detecting files
+
+Check the `DAGSTER_TEST_DATA_PATH` environment variable points to a directory containing `.xml` files. The sensor only processes files with the `.xml` extension.
+
+### Test failures
+
+Ensure dependencies are installed with dev extras:
+
+```bash
+uv sync --extra dev
 ```
 
 ## Project Configuration

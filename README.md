@@ -303,7 +303,9 @@ Ensure dependencies are installed with dev extras:
 uv sync --extra dev
 ```
 
-## Project Configuration
+## License
+
+[Apache License 2.0](LICENSE) - © 2026 ETH Zurich
 
 - `flake.nix`: Defines the development environment and dependencies
 - `.envrc`: Configures direnv to use the Nix flake

@@ -18,6 +18,7 @@
             pkgs.kubernetes-helm
             pkgs.just
             pkgs.jq
+            pkgs.curl
           ];
         };
       });

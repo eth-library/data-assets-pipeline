@@ -23,3 +23,6 @@
 /history/
 /schedules/
 /storage/
+/.logs_queue/
+/.nux/
+/logs/

@@ -5,8 +5,13 @@ build-backend = "hatchling.build"
 [project]
 name = "da_pipeline"
 version = "0.1.0"
+description = "A Dagster-based orchestrator for OAIS-compliant SIP processing"
 requires-python = ">=3.12"
-
+license = "Apache-2.0"
+authors = [
+  { name = "Jaime Cardozo", email = "jaime.cardozo@library.ethz.ch" },
+]
+keywords = ["dagster", "mets", "oais", "sip", "digital-preservation"]
 dependencies = [
   "dagster>=1.10.15",
   "dagster-webserver>=1.10.15",

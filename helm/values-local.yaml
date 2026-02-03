@@ -1,0 +1,80 @@
+# Local Kubernetes development overrides
+# Requires: Docker Desktop with Kubernetes enabled
+---
+
+####################################################################################################
+# User Code Deployments - Local overrides
+####################################################################################################
+dagster-user-deployments:
+  deployments:
+    - name: "da-pipeline"
+      image:
+        repository: da-pipeline
+        tag: local
+        # Never pull from registry - use local image only
+        pullPolicy: Never
+      dagsterApiGrpcArgs:
+        - "--python-file"
+        - "/da_pipeline/definitions.py"
+      port: 3030
+      includeConfigInLaunchedRuns:
+        enabled: true
+
+      # Environment variables for local dev
+      env:
+        - name: DAGSTER_TEST_DATA_PATH
+          value: "/da_pipeline_tests/test_data"
+
+      # Mount test data and persistent storage
+      volumes:
+        - name: test-data-xml
+          configMap:
+            name: test-data-xml
+        - name: dagster-storage
+          persistentVolumeClaim:
+            claimName: dagster-storage
+
+      volumeMounts:
+        - name: test-data-xml
+          mountPath: /da_pipeline_tests/test_data
+        - name: dagster-storage
+          mountPath: /opt/dagster/dagster_home/storage
+
+####################################################################################################
+# Run Launcher - Local overrides
+####################################################################################################
+runLauncher:
+  type: K8sRunLauncher
+  config:
+    k8sRunLauncher:
+      # Never pull from registry - use local image only
+      imagePullPolicy: "Never"
+      loadInclusterConfig: true
+
+      # Environment variables for run pods
+      envVars:
+        - "DAGSTER_TEST_DATA_PATH=/da_pipeline_tests/test_data"
+
+      # Mount test data and persistent storage in run pods
+      volumes:
+        - name: dagster-storage
+          persistentVolumeClaim:
+            claimName: dagster-storage
+        - name: test-data-xml
+          configMap:
+            name: test-data-xml
+
+      volumeMounts:
+        - name: dagster-storage
+          mountPath: /opt/dagster/dagster_home/storage
+        - name: test-data-xml
+          mountPath: /da_pipeline_tests/test_data
+
+####################################################################################################
+# Pipeline Run Image - Local overrides
+####################################################################################################
+pipelineRun:
+  image:
+    repository: da-pipeline
+    tag: local
+    pullPolicy: Never

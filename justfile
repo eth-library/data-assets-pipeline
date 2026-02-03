@@ -9,6 +9,7 @@ release := "dagster"
 image := "da-pipeline:local"
 helm_chart := "dagster/dagster"
 helm_version := "1.10.14"
+pg_secret_name := "dagster-postgresql"  # K8s secret name (password auto-generated)
 
 # Default: show available commands
 default:
@@ -179,6 +180,14 @@ _helm-up:
 
     # Ensure namespace
     kubectl create namespace {{ namespace }} --dry-run=client -o yaml | kubectl apply -f -
+
+    # Create K8s secret with random password (generated once, reused on subsequent runs)
+    if ! kubectl get secret {{ pg_secret_name }} -n {{ namespace }} &>/dev/null; then
+        kubectl create secret generic {{ pg_secret_name }} \
+            --from-literal=postgresql-password="$(openssl rand -base64 24)" \
+            -n {{ namespace }}
+        echo "Created K8s secret '{{ pg_secret_name }}' with random password."
+    fi
 
     # Setup helm repo (only update if not updated in last hour)
     helm repo add dagster https://dagster-io.github.io/helm 2>/dev/null || true

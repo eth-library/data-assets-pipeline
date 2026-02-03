@@ -1,23 +1,21 @@
-# Data Archive Assets Pipeline
+# Data Archive Pipeline (DAP) Orchestrator
 
-## Overview
+A [Dagster](https://dagster.io/)-based orchestrator for processing digital assets following the OAIS reference model. Manages Submission Information Packages (SIPs) with support for multiple metadata standards including Dublin Core, METS, and PREMIS for comprehensive digital preservation.
+> **Domain Terms**
+>
+> - **METS** (Metadata Encoding and Transmission Standard): XML schema for encoding metadata about digital objects
+> - **OAIS** (Open Archival Information System): ISO reference model for digital preservation systems
+> - **SIP** (Submission Information Package): A package submitted to an archive for ingest
+> - **IE** (Intellectual Entity): A distinct unit of information to be preserved (e.g., a document, dataset)
 
-This project implements a digital asset processing pipeline that implements the Submission Information Package (SIP)
-component of the Open Archival Information System (OAIS) reference model and METS (Metadata Encoding and Transmission
-Standard) specifications. It processes and manages digital assets within a data archive by extracting metadata from METS
-files and organizing them into structured SIPs.
+## Features
 
-The system uses [Dagster](https://dagster.io/) as its core data orchestrator, providing robust workflow management
-for complex archiving processes. The implementation ensures:
-
-- **OAIS SIP Processing**: Implements the OAIS Submission Information Package model with structured metadata handling
-- **METS Standard Support**: Full parsing and processing of METS XML files
-- **Data Validation**: Robust validation using Pydantic models
-- **Scalable Architecture**: Modular design for handling complex archiving workflows
-
-## Setup
-
-### Recommended Nix + Direnv Setup
+- Parses METS XML files into validated Pydantic models following OAIS standards
+- Extracts Dublin Core descriptive metadata and PREMIS preservation metadata
+- Validates file fixity information (MD5, SHA-1, SHA-256, SHA-512 checksums)
+- Automated file monitoring via Dagster sensors
+- Hot-reload development with instant feedback
+- Kubernetes-ready with Helm chart configuration
 
 We recommend using the fully automatic setup method using Nix Flakes and Direnv:
 

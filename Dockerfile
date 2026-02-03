@@ -15,15 +15,16 @@ COPY . /
 # This makes sure that logs show up immediately instead of being buffered
 ENV PYTHONUNBUFFERED=1
 
-# Update pip to the latest version
-RUN pip install --upgrade pip
+# Install uv package manager
+RUN pip install uv
 
 # Install the project with production dependencies
 # This will install:
 # - Core dependencies
 # - Production dependencies
 # as specified in pyproject.toml
-RUN pip install --index-url=https://pypi.org/simple/ --extra-index-url=https://test.pypi.org/simple/ .[production]
+# Using --system to install to system Python (not venv) so dagster is in PATH
+RUN uv pip install --system .[production]
 
 # Set the working directory to the main package directory
 # This aligns with the module_name in pyproject.toml [tool.dagster] section

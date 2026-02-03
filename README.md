@@ -17,7 +17,15 @@ A [Dagster](https://dagster.io/)-based orchestrator for processing digital asset
 - Hot-reload development with instant feedback
 - Kubernetes-ready with Helm chart configuration
 
-We recommend using the fully automatic setup method using Nix Flakes and Direnv:
+> ### Project Status Notice
+> This project is in **alpha** and actively evolving.
+>
+> - **Stability:** Bugs, breaking changes, or incomplete features may occur.
+> - **Evolution:** APIs and behaviors can change as we refine functionality.
+>
+> Provided as‑is, with no guarantees on stability.
+>
+> We appreciate your patience and feedback!
 
 #### Prerequisites
 

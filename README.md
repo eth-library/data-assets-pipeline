@@ -307,8 +307,32 @@ uv sync --extra dev
 
 [Apache License 2.0](LICENSE) - © 2026 ETH Zurich
 
-- `flake.nix`: Defines the development environment and dependencies
-- `.envrc`: Configures direnv to use the Nix flake
-- `pyproject.toml`: Defines Python package metadata and dependencies
-- `workspace.yaml`: Configures Dagster code locations
-- `uv.lock`: Locks dependencies to specific versions
+## Further Reading
+
+### Core Technologies
+
+- [Dagster Documentation](https://docs.dagster.io/) - Data orchestration platform
+  - [Assets](https://docs.dagster.io/concepts/assets/software-defined-assets)
+  - [Sensors](https://docs.dagster.io/concepts/partitions-schedules-sensors/sensors)
+  - [Definitions](https://docs.dagster.io/concepts/code-locations)
+- [Pydantic Documentation](https://docs.pydantic.dev/) - Data validation library
+
+### Digital Preservation Standards
+
+- [METS (Metadata Encoding and Transmission Standard)](https://www.loc.gov/standards/mets/)
+- [OAIS Reference Model (ISO 14721)](https://www.iso.org/standard/57284.html)
+- [Dublin Core Metadata](https://www.dublincore.org/specifications/dublin-core/)
+- [PREMIS (Preservation Metadata)](https://www.loc.gov/standards/premis/)
+
+### Development Tools
+
+- [uv](https://github.com/astral-sh/uv) - Fast Python package manager
+- [just](https://github.com/casey/just) - Command runner
+- [Nix](https://nixos.org/) - Reproducible development environments
+- [direnv](https://direnv.net/) - Automatic environment loading
+- [Ruff](https://docs.astral.sh/ruff/) - Python linter and formatter
+
+### Kubernetes
+
+- [Helm](https://helm.sh/docs/) - Kubernetes package manager
+- [Dagster Helm Chart](https://docs.dagster.io/deployment/guides/kubernetes/deploying-with-helm)

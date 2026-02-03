@@ -21,6 +21,11 @@
             pkgs.curl
             pkgs.openssl
           ];
+
+          # Required for pip-installed packages with C++ extensions (e.g., grpcio)
+          LD_LIBRARY_PATH = pkgs.lib.makeLibraryPath [
+            pkgs.stdenv.cc.cc.lib
+          ];
         };
       });
     };

@@ -19,6 +19,7 @@
             pkgs.just
             pkgs.jq
             pkgs.curl
+            pkgs.openssl
           ];
         };
       });

@@ -80,7 +80,6 @@ k8s-up: _check-k8s _build _helm-up
     (while ! kubectl port-forward svc/dagster-dagster-webserver 8080:80 -n {{ namespace }} &>/dev/null; do sleep 2; done) &
 
     echo "Waiting for webserver to start..."
-    attempt=1
     while true; do
         if curl -s -o /dev/null -w '' --connect-timeout 1 http://localhost:8080 2>/dev/null; then
             echo ""
@@ -88,8 +87,7 @@ k8s-up: _check-k8s _build _helm-up
             echo "  URL: http://localhost:8080"
             exit 0
         fi
-        echo "[$(date +%H:%M:%S)] Attempt $attempt - Waiting for webserver... (retrying in 2s)"
-        attempt=$((attempt + 1))
+        echo "[$(date +%H:%M:%S)] Waiting for webserver... (retrying in 2s)"
         sleep 2
     done
 

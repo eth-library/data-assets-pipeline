@@ -8,7 +8,6 @@
     }
   },
   "onCreateCommand": "nix profile add nixpkgs#direnv nixpkgs#nix-direnv && echo 'eval \"$(direnv hook bash)\"' >> ~/.bashrc && echo 'source $HOME/.nix-profile/share/nix-direnv/direnvrc' >> ~/.direnvrc",
-  "postAttachCommand": "direnv allow .",
   "customizations": {
     "vscode": {
       "extensions": [

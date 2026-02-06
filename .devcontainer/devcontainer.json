@@ -20,7 +20,12 @@
     "vscode": {
       "extensions": [
         "jnoortheen.nix-ide",
-        "mkhl.direnv",
+        /*
+         * direnv extension (mkhl.direnv) not needed:
+         * - bash hook handles terminal environment
+         * - python.defaultInterpreterPath is set explicitly
+         * - avoids reload prompt on codespace startup
+         */
         "ms-python.python",
         "charliermarsh.ruff"
       ],

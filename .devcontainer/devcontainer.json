@@ -12,6 +12,7 @@
     "vscode": {
       "extensions": [
         "jnoortheen.nix-ide",
+        "mkhl.direnv",
         "ms-python.python",
         "charliermarsh.ruff"
       ],

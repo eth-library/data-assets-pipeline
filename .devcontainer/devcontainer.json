@@ -16,6 +16,8 @@
    * 5. Pre-allow and pre-warm the environment (builds nix flake during container creation)
    */
   "onCreateCommand": "nix profile add nixpkgs#direnv nixpkgs#nix-direnv && echo 'eval \"$(direnv hook bash)\"' >> ~/.bashrc && echo 'direnv reload 2>/dev/null' >> ~/.bashrc && echo 'source $HOME/.nix-profile/share/nix-direnv/direnvrc' >> ~/.direnvrc && direnv allow . && direnv exec . true",
+  // Open a terminal on attach (triggers bashrc → direnv → dev shell info)
+  "postAttachCommand": "exec bash",
   "customizations": {
     "vscode": {
       "extensions": [
@@ -32,9 +34,7 @@
       "settings": {
         "python.defaultInterpreterPath": "${workspaceFolder}/.venv/bin/python",
         "python.terminal.activateEnvironment": false,
-        "terminal.integrated.shellIntegration.enabled": true,
-        "terminal.integrated.hideOnStartup": "never",
-        "terminal.integrated.launchTerminalOnStartup": true
+        "terminal.integrated.shellIntegration.enabled": true
       }
     }
   },

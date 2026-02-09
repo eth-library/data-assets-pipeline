@@ -5,6 +5,9 @@
 .cli/vendor/
 vendor/
 
+# Go build output
+.cli/bin/
+
 # Devbox environment
 .devbox/
 

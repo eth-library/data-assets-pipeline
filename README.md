@@ -48,7 +48,7 @@ nix develop
 Start the Dagster development server:
 
 ```bash
-just dev
+dap dev
 ```
 
 Open http://localhost:3000 in your browser.
@@ -59,7 +59,7 @@ Ensure you have the following installed:
 
 - Python 3.12+
 - [uv](https://github.com/astral-sh/uv) (Python package manager)
-- [just](https://github.com/casey/just) (command runner)
+- [Go 1.22+](https://go.dev/dl/) (for the dap CLI)
 
 Set up the project:
 
@@ -69,12 +69,16 @@ cd data-assets-pipeline
 uv venv --python python3.12
 source .venv/bin/activate
 uv sync --extra dev
+
+# Build the dap CLI
+cd .cli && go build -o bin/dap . && cd ..
+export PATH="$PWD/.cli/bin:$PATH"
 ```
 
 Start the Dagster development server:
 
 ```bash
-dagster dev
+dap dev
 ```
 
 Open http://localhost:3000 in your browser.
@@ -85,9 +89,10 @@ Open http://localhost:3000 in your browser.
 |------|---------|--------------|
 | [Nix](https://nixos.org/download.html) | Development environment (optional but recommended) | [Install guide](https://nixos.org/download.html) |
 | [direnv](https://direnv.net/) | Automatic environment loading | [Install guide](https://direnv.net/docs/installation.html) |
+| [nix-direnv](https://github.com/nix-community/nix-direnv) | Fast Nix + direnv integration | [Install guide](https://github.com/nix-community/nix-direnv#installation) |
 | Python 3.12+ | Runtime | [python.org](https://www.python.org/downloads/) |
 | [uv](https://github.com/astral-sh/uv) | Fast Python package manager | `curl -LsSf https://astral.sh/uv/install.sh \| sh` |
-| [just](https://github.com/casey/just) | Command runner | `cargo install just` or via package manager |
+| [Go 1.22+](https://go.dev/dl/) | dap CLI build | [go.dev](https://go.dev/dl/) |
 
 For Kubernetes development, you'll also need:
 
@@ -120,13 +125,13 @@ The `xml_file_sensor` monitors a configured directory for new XML files and auto
 Start the Dagster UI with hot-reload:
 
 ```bash
-just dev
+dap dev
 ```
 
 Run the test suite:
 
 ```bash
-just test
+dap test
 ```
 
 ### Manual Pipeline Runs
@@ -148,7 +153,7 @@ Requires Docker Desktop with Kubernetes enabled (Settings → Kubernetes → Ena
 Deploy to local Kubernetes:
 
 ```bash
-just k8s-up
+dap k8s up
 ```
 
 The Dagster UI will be available at http://localhost:8080.
@@ -156,13 +161,13 @@ The Dagster UI will be available at http://localhost:8080.
 Rebuild and restart after code changes:
 
 ```bash
-just k8s-restart
+dap k8s restart
 ```
 
 Tear down the deployment:
 
 ```bash
-just k8s-down
+dap k8s down
 ```
 
 ## Configuration
@@ -171,7 +176,9 @@ just k8s-down
 
 | Variable | Description | Default |
 |----------|-------------|---------|
+| `DAGSTER_HOME` | Dagster instance directory | Project root (set by `.envrc`) |
 | `DAGSTER_TEST_DATA_PATH` | Directory containing METS XML files for the sensor to monitor | `da_pipeline_tests/test_data` |
+| `DAP_QUIET` | Set to `1` to hide the "Commands" hint in welcome banner | unset |
 
 Copy `.env.example` to `.env` and modify as needed.
 
@@ -179,8 +186,8 @@ Copy `.env.example` to `.env` and modify as needed.
 
 | File | Purpose |
 |------|---------|
-| `flake.nix` | Nix development environment (Python, uv, kubectl, helm, just) |
-| `justfile` | Task runner commands |
+| `flake.nix` | Nix development environment (Python, uv, Go, kubectl, helm) |
+| `.cli/` | Go CLI source code (see [.cli/CONTRIBUTING.md](.cli/CONTRIBUTING.md)) |
 | `pyproject.toml` | Python project metadata and dependencies |
 | `dagster.yaml` | Dagster instance configuration |
 | `config.yaml` | Example run configuration for manual pipeline execution |
@@ -190,46 +197,38 @@ Copy `.env.example` to `.env` and modify as needed.
 
 ## Commands Reference
 
-Run `just` or `just --list` to see all available commands.
-
-### General
+Run `dap --help` to see all available commands.
 
 | Command | Description |
 |---------|-------------|
-| `just setup` | Create virtual environment and install dependencies |
-| `just info` | Show tool versions and available commands |
-| `just versions` | Show tool versions only |
+| `dap dev` | Start Dagster development server (localhost:3000) |
+| `dap test` | Run pytest test suite |
+| `dap check` | Run all quality checks (lint + typecheck + test) |
+| `dap lint` | Check code style with Ruff (use `--fix` to auto-format) |
+| `dap typecheck` | Type check with mypy |
+| `dap versions` | Show tool versions |
+| `dap clean` | Remove `.venv` and caches |
+| `dap reset` | Clean and reinstall dependencies |
+| `dap materialize` | Materialize all Dagster assets |
+| `dap run` | Run the ingest_sip_job |
+| `dap k8s up` | Build and deploy to local Kubernetes (localhost:8080) |
+| `dap k8s down` | Tear down Kubernetes deployment |
+| `dap k8s restart` | Rebuild and restart user code pod |
+| `dap k8s status` | Show pods and services |
+| `dap k8s logs` | Stream logs from user code pod |
+| `dap k8s shell` | Open shell in user code pod |
 
-### Local Development
-
-| Command | Description |
-|---------|-------------|
-| `just dev` | Start Dagster server at localhost:3000 |
-| `just test` | Run pytest test suite |
-
-### Code Quality
-
-| Command | Description |
-|---------|-------------|
-| `just lint` | Check code with Ruff (no modifications) |
-| `just fmt` | Format and fix code with Ruff |
-
-### Kubernetes
-
-| Command | Description |
-|---------|-------------|
-| `just k8s-up` | Build image, deploy to Kubernetes, port-forward to localhost:8080 |
-| `just k8s-down` | Tear down Kubernetes deployment |
-| `just k8s-restart` | Rebuild image and restart user code pod |
-| `just k8s-status` | Show pods and services |
-| `just k8s-logs` | Stream logs from user code pod |
-| `just k8s-ui` | Port-forward to Dagster UI (if not already running) |
-| `just k8s-shell` | Open shell in user code pod |
+For CLI development, see [.cli/CONTRIBUTING.md](.cli/CONTRIBUTING.md).
 
 ## Project Structure
 
 ```
-da_pipeline/                 # Main package
+.cli/                        # dap CLI (Go) - see .cli/CONTRIBUTING.md
+├── cmd/                     # Command implementations
+├── internal/                # Internal packages (ui, exec)
+└── main.go                  # Entry point
+
+da_pipeline/                 # Main package (Python)
 ├── definitions.py           # Dagster entry point (Definitions)
 ├── assets.py                # Pipeline assets
 ├── sensors.py               # File monitoring sensor and job definition
@@ -327,7 +326,9 @@ uv sync --extra dev
 ### Development Tools
 
 - [uv](https://github.com/astral-sh/uv) - Fast Python package manager
-- [just](https://github.com/casey/just) - Command runner
+- [Go](https://go.dev/) - Programming language for the dap CLI
+- [Cobra](https://github.com/spf13/cobra) - Go CLI framework
+- [Charmbracelet](https://charm.sh/) - Terminal UI libraries
 - [Nix](https://nixos.org/) - Reproducible development environments
 - [direnv](https://direnv.net/) - Automatic environment loading
 - [Ruff](https://docs.astral.sh/ruff/) - Python linter and formatter

@@ -11,9 +11,9 @@ buildGoApplication {
   '';
 
   meta = with lib; {
-    description = "Developer tools for the Data Archive Pipeline (DAP) Orchestrator";
-    homepage = "https://github.com/eth-library/dap";
-    license = licenses.mit;
+    description = "Development tooling for the DAP Orchestrator";
+    homepage = "https://github.com/eth-library/data-assets-pipeline";
+    license = licenses.asl20;
     mainProgram = "dap";
   };
 }

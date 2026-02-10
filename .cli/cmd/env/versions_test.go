@@ -28,18 +28,6 @@ func TestVersionParsing(t *testing.T) {
 	t.Run("getHelmVersion handles missing helm gracefully", func(t *testing.T) {
 		_ = getHelmVersion()
 	})
-
-	t.Run("getJqVersion handles missing jq gracefully", func(t *testing.T) {
-		_ = getJqVersion()
-	})
-
-	t.Run("getCurlVersion handles missing curl gracefully", func(t *testing.T) {
-		_ = getCurlVersion()
-	})
-
-	t.Run("getOpensslVersion handles missing openssl gracefully", func(t *testing.T) {
-		_ = getOpensslVersion()
-	})
 }
 
 func TestShowVersionsFunctions(t *testing.T) {

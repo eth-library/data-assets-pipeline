@@ -43,12 +43,10 @@ func ShowVersionsCompact() {
 func ShowVersionsFull() {
 	showVersion("python", getPythonVersion())
 	showVersion("uv", getUVVersion())
+	showVersion("dagster", getDagsterVersion())
 	showVersion("go", runtime.Version())
 	showVersion("kubectl", getKubectlVersion())
 	showVersion("helm", getHelmVersion())
-	showVersion("jq", getJqVersion())
-	showVersion("curl", getCurlVersion())
-	showVersion("openssl", getOpensslVersion())
 }
 
 func showVersion(name, version string) {
@@ -132,38 +130,3 @@ func getHelmVersion() string {
 	return out
 }
 
-func getJqVersion() string {
-	out, err := exec.Run("jq", "--version")
-	if err != nil {
-		return ""
-	}
-	return strings.TrimPrefix(out, "jq-")
-}
-
-func getCurlVersion() string {
-	out, err := exec.Run("curl", "--version")
-	if err != nil {
-		return ""
-	}
-	// First line is "curl X.Y.Z ..."
-	if idx := strings.Index(out, " "); idx > 0 {
-		rest := out[idx+1:]
-		if end := strings.Index(rest, " "); end > 0 {
-			return rest[:end]
-		}
-	}
-	return ""
-}
-
-func getOpensslVersion() string {
-	out, err := exec.Run("openssl", "version")
-	if err != nil {
-		return ""
-	}
-	// Output is "OpenSSL X.Y.Z ..."
-	parts := strings.Fields(out)
-	if len(parts) >= 2 {
-		return parts[1]
-	}
-	return ""
-}

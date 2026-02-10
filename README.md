@@ -42,7 +42,10 @@ direnv allow
 If not using [direnv](https://direnv.net/), activate the environment manually:
 
 ```bash
-nix develop
+nix develop          # Full environment (Python, uv, dap CLI, Go, kubectl, helm)
+nix develop .#minimal  # Minimal: Python, uv, dap CLI only
+nix develop .#k8s      # K8s: adds kubectl and helm
+nix develop .#cli-dev  # CLI development: Python, uv, Go (no dap CLI)
 ```
 
 Start the Dagster development server:
@@ -186,7 +189,7 @@ Copy `.env.example` to `.env` and modify as needed.
 
 | File | Purpose |
 |------|---------|
-| `flake.nix` | Nix development environment (Python, uv, Go, kubectl, helm) |
+| `flake.nix` | Nix development environment with multiple shells (see below) |
 | `.cli/` | Go CLI source code (see [.cli/CONTRIBUTING.md](.cli/CONTRIBUTING.md)) |
 | `pyproject.toml` | Python project metadata and dependencies |
 | `dagster.yaml` | Dagster instance configuration |
@@ -195,9 +198,26 @@ Copy `.env.example` to `.env` and modify as needed.
 | `helm/values-local.yaml` | Local Kubernetes overrides |
 | `helm/pvc.yaml` | Persistent volume claim for Dagster storage |
 
+### Development Shells
+
+The Nix flake provides multiple development shells for different use cases:
+
+| Shell | Command | Packages | Use Case |
+|-------|---------|----------|----------|
+| default | `nix develop` | Python, uv, dap CLI, Go, kubectl, helm | Full development |
+| minimal | `nix develop .#minimal` | Python, uv, dap CLI | Running pipeline and tests |
+| k8s | `nix develop .#k8s` | Python, uv, dap CLI, kubectl, helm | Kubernetes deployment |
+| cli-dev | `nix develop .#cli-dev` | Python, uv, Go, gomod2nix | Working on the dap CLI |
+
+The **default** shell is automatically loaded when using `direnv allow` (via `.envrc`) or running `nix develop` without arguments. It includes all tools needed for full development.
+
+The specialized shells (`minimal`, `k8s`, `cli-dev`) are useful for CI pipelines where faster startup and smaller environments are beneficial.
+
 ## Commands Reference
 
 Run `dap --help` to see all available commands.
+
+### Development
 
 | Command | Description |
 |---------|-------------|
@@ -206,11 +226,26 @@ Run `dap --help` to see all available commands.
 | `dap check` | Run all quality checks (lint + typecheck + test) |
 | `dap lint` | Check code style with Ruff (use `--fix` to auto-format) |
 | `dap typecheck` | Type check with mypy |
-| `dap versions` | Show tool versions |
+
+### Environment
+
+| Command | Description |
+|---------|-------------|
+| `dap versions` | Show tool versions (use `--all` for full list) |
 | `dap clean` | Remove `.venv` and caches |
 | `dap reset` | Clean and reinstall dependencies |
+
+### Dagster
+
+| Command | Description |
+|---------|-------------|
 | `dap materialize` | Materialize all Dagster assets |
 | `dap run` | Run the ingest_sip_job |
+
+### Kubernetes
+
+| Command | Description |
+|---------|-------------|
 | `dap k8s up` | Build and deploy to local Kubernetes (localhost:8080) |
 | `dap k8s down` | Tear down Kubernetes deployment |
 | `dap k8s restart` | Rebuild and restart user code pod |
@@ -218,7 +253,9 @@ Run `dap --help` to see all available commands.
 | `dap k8s logs` | Stream logs from user code pod |
 | `dap k8s shell` | Open shell in user code pod |
 
-For CLI development, see [.cli/CONTRIBUTING.md](.cli/CONTRIBUTING.md).
+### CLI Development
+
+For working on the dap CLI itself, see [.cli/CONTRIBUTING.md](.cli/CONTRIBUTING.md).
 
 ## Project Structure
 

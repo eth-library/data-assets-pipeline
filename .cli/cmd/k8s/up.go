@@ -1,6 +1,8 @@
 package k8s
 
 import (
+	"crypto/rand"
+	"encoding/base64"
 	"fmt"
 	"os"
 	"os/exec"
@@ -9,6 +11,13 @@ import (
 	"github.com/eth-library/dap/cli/internal/ui"
 	"github.com/spf13/cobra"
 )
+
+// generatePassword creates a cryptographically secure random password
+func generatePassword() string {
+	bytes := make([]byte, 24)
+	rand.Read(bytes)
+	return base64.StdEncoding.EncodeToString(bytes)
+}
 
 var upCmd = &cobra.Command{
 	Use:   "up",
@@ -43,7 +52,7 @@ var upCmd = &cobra.Command{
 		// Create PostgreSQL secret if it doesn't exist
 		if _, err := dapexec.Run("kubectl", "get", "secret", PGSecretName, "-n", Namespace); err != nil {
 			ui.Info("Creating PostgreSQL secret...")
-			password, _ := dapexec.Run("openssl", "rand", "-base64", "24")
+			password := generatePassword()
 			if err := dapexec.RunPassthrough("kubectl", "create", "secret", "generic", PGSecretName,
 				"--from-literal=postgresql-password="+password,
 				"-n", Namespace); err != nil {

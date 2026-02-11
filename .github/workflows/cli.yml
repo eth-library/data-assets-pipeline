@@ -24,16 +24,5 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - uses: cachix/install-nix-action@v31
-      - name: Run go vet
-        run: nix develop .#cli-dev --command bash -c "cd cli && go vet ./..."
-      - name: Check formatting
-        run: |
-          nix develop .#cli-dev --command bash -c '
-            cd cli
-            unformatted=$(gofmt -l .)
-            if [ -n "$unformatted" ]; then
-              echo "Files not formatted:"
-              echo "$unformatted"
-              exit 1
-            fi
-          '
+      - name: Lint and check formatting
+        run: nix develop .#cli-dev --command dap cli lint

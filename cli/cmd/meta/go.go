@@ -1,8 +1,10 @@
 package meta
 
 import (
+	"fmt"
 	"os"
 	"path/filepath"
+	"strings"
 
 	"github.com/eth-library/dap/cli/internal/exec"
 	"github.com/eth-library/dap/cli/internal/ui"
@@ -105,6 +107,51 @@ var CliTestCmd = &cobra.Command{
 	},
 }
 
+// CliLintCmd runs linting and format checks for the Go CLI.
+var CliLintCmd = &cobra.Command{
+	Use:   "lint",
+	Short: "Lint and check formatting",
+	Long:  "Runs go vet and checks gofmt formatting for all CLI packages.",
+	RunE: func(cmd *cobra.Command, args []string) error {
+		// Find cli directory
+		cliDir, err := findCliDir()
+		if err != nil {
+			return err
+		}
+
+		// Change to cli directory
+		origDir, _ := os.Getwd()
+		if err := os.Chdir(cliDir); err != nil {
+			return err
+		}
+		defer os.Chdir(origDir)
+
+		ui.Info("Running go vet...")
+		if err := exec.RunPassthrough("go", "vet", "./..."); err != nil {
+			ui.Error("go vet failed", "error", err)
+			return err
+		}
+		ui.Success("go vet passed")
+
+		ui.Info("Checking formatting...")
+		output, err := exec.Run("gofmt", "-l", ".")
+		if err != nil {
+			ui.Error("gofmt failed", "error", err)
+			return err
+		}
+		if output != "" {
+			ui.Error("Files not formatted:")
+			for _, f := range strings.Split(strings.TrimSpace(output), "\n") {
+				ui.ListItem(f)
+			}
+			return fmt.Errorf("gofmt check failed")
+		}
+		ui.Success("Formatting check passed")
+
+		return nil
+	},
+}
+
 // findCliDir locates the cli directory relative to the current working directory or repo root.
 func findCliDir() (string, error) {
 	// Check if we're already in cli
@@ -140,4 +187,5 @@ func init() {
 	CliTestCmd.Flags().BoolP("verbose", "v", false, "Verbose test output")
 	CliCmd.AddCommand(CliBuildCmd)
 	CliCmd.AddCommand(CliTestCmd)
+	CliCmd.AddCommand(CliLintCmd)
 }

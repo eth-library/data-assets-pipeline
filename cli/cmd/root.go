@@ -23,7 +23,7 @@ const (
 var rootCmd = &cobra.Command{
 	Use:     "dap",
 	Version: version,
-	Short: "Developer tools for the Data Archive Pipeline (DAP) Orchestrator",
+	Short:   "Developer tools for the Data Archive Pipeline (DAP) Orchestrator",
 	Long: `dap is the CLI for the Data Archive Pipeline (DAP) Orchestrator.
 
 A Dagster-based orchestrator for processing digital assets following

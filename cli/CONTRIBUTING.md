@@ -218,16 +218,35 @@ if err := exec.RunPassthrough("ruff", "check", "."); err != nil {
 ## Testing
 
 ```bash
-dap go test       # Run tests
-dap go test -v    # Verbose output
+dap cli test       # Run tests
+dap cli test -v    # Verbose output
+```
+
+## Linting
+
+```bash
+dap cli lint          # Check go vet and formatting
+dap cli lint --fix    # Auto-fix formatting, then run go vet
 ```
 
 ## Building
 
 ```bash
-dap go build      # Quick build to cli/bin/dap
-dap build         # Full rebuild (go mod tidy + gomod2nix + nix build)
+dap cli build     # Full rebuild (go mod tidy + gomod2nix + nix build)
 ```
+
+`dap cli build` runs three steps:
+
+1. **`go mod tidy`** — syncs `go.mod` and `go.sum` with the actual imports in the code
+2. **`gomod2nix`** — regenerates `gomod2nix.toml` from `go.sum`, translating Go dependency hashes into a format Nix can use (skipped if not installed)
+3. **`nix build .#dap`** — builds the binary in a hermetic Nix sandbox
+
+The Nix build chain works as follows:
+
+- The root `flake.nix` delegates to `cli/flake.nix`, which loads the [gomod2nix](https://github.com/nix-community/gomod2nix) overlay
+- `cli/package.nix` defines the build using `buildGoApplication`, which compiles the Go source with pinned dependencies from `gomod2nix.toml`
+- Linker flags (`-s -w`) strip debug info for a smaller binary, and `-X ...cmd.version` embeds the version string
+- The output binary is renamed from `cli` to `dap` and placed at `result/bin/dap`
 
 ## Dependency Management
 
@@ -268,7 +287,7 @@ const (
 
 ## Release Checklist
 
-1. `dap go test` - Run tests
-2. `dap go build` - Build
-3. `./bin/dap --help` - Test manually
-4. `dap build` - Full Nix build
+1. `dap cli test` - Run tests
+2. `dap cli lint` - Check formatting and vet
+3. `dap cli build` - Full rebuild
+4. `./bin/dap --help` - Test manually

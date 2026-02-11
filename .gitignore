@@ -2,11 +2,11 @@
 .venv/
 
 # Go vendor (using gomod2nix instead)
-.cli/vendor/
+cli/vendor/
 vendor/
 
 # Go build output
-.cli/bin/
+cli/bin/
 
 # Devbox environment
 .devbox/

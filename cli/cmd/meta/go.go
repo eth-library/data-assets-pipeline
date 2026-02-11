@@ -22,13 +22,13 @@ var CliBuildCmd = &cobra.Command{
 	Short: "Rebuild the dap CLI",
 	Long:  "Runs go mod tidy, gomod2nix, and nix build to rebuild the CLI.",
 	RunE: func(cmd *cobra.Command, args []string) error {
-		// Find .cli directory
+		// Find cli directory
 		cliDir, err := findCliDir()
 		if err != nil {
 			return err
 		}
 
-		// Change to .cli directory
+		// Change to cli directory
 		origDir, _ := os.Getwd()
 		if err := os.Chdir(cliDir); err != nil {
 			return err
@@ -78,13 +78,13 @@ var CliTestCmd = &cobra.Command{
 	RunE: func(cmd *cobra.Command, args []string) error {
 		verbose, _ := cmd.Flags().GetBool("verbose")
 
-		// Find .cli directory
+		// Find cli directory
 		cliDir, err := findCliDir()
 		if err != nil {
 			return err
 		}
 
-		// Change to .cli directory
+		// Change to cli directory
 		origDir, _ := os.Getwd()
 		if err := os.Chdir(cliDir); err != nil {
 			return err
@@ -105,24 +105,24 @@ var CliTestCmd = &cobra.Command{
 	},
 }
 
-// findCliDir locates the .cli directory relative to the current working directory or repo root.
+// findCliDir locates the cli directory relative to the current working directory or repo root.
 func findCliDir() (string, error) {
-	// Check if we're already in .cli
+	// Check if we're already in cli
 	if _, err := os.Stat("go.mod"); err == nil {
 		if _, err := os.Stat("gomod2nix.toml"); err == nil {
 			return ".", nil
 		}
 	}
 
-	// Check for .cli in current directory
-	if _, err := os.Stat(".cli/go.mod"); err == nil {
-		return ".cli", nil
+	// Check for cli in current directory
+	if _, err := os.Stat("cli/go.mod"); err == nil {
+		return "cli", nil
 	}
 
-	// Walk up to find repo root with .cli
+	// Walk up to find repo root with cli
 	dir, _ := os.Getwd()
 	for {
-		cliPath := filepath.Join(dir, ".cli")
+		cliPath := filepath.Join(dir, "cli")
 		if _, err := os.Stat(filepath.Join(cliPath, "go.mod")); err == nil {
 			return cliPath, nil
 		}

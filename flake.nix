@@ -3,7 +3,7 @@
 
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-25.11";
-    dap-cli.url = "path:./.cli";
+    dap-cli.url = "path:./cli";
   };
 
   outputs = { self, nixpkgs, dap-cli }:

@@ -74,8 +74,8 @@ source .venv/bin/activate
 uv sync --extra dev
 
 # Build the dap CLI
-cd .cli && go build -o bin/dap . && cd ..
-export PATH="$PWD/.cli/bin:$PATH"
+cd cli && go build -o bin/dap . && cd ..
+export PATH="$PWD/cli/bin:$PATH"
 ```
 
 Start the Dagster development server:
@@ -190,7 +190,7 @@ Copy `.env.example` to `.env` and modify as needed.
 | File | Purpose |
 |------|---------|
 | `flake.nix` | Nix development environment with multiple shells (see below) |
-| `.cli/` | Go CLI source code (see [.cli/CONTRIBUTING.md](.cli/CONTRIBUTING.md)) |
+| `cli/` | Go CLI source code (see [cli/CONTRIBUTING.md](cli/CONTRIBUTING.md)) |
 | `pyproject.toml` | Python project metadata and dependencies |
 | `dagster.yaml` | Dagster instance configuration |
 | `config.yaml` | Example run configuration for manual pipeline execution |
@@ -255,12 +255,12 @@ Run `dap --help` to see all available commands.
 
 ### CLI Development
 
-For working on the dap CLI itself, see [.cli/CONTRIBUTING.md](.cli/CONTRIBUTING.md).
+For working on the dap CLI itself, see [cli/CONTRIBUTING.md](cli/CONTRIBUTING.md).
 
 ## Project Structure
 
 ```
-.cli/                        # dap CLI (Go) - see .cli/CONTRIBUTING.md
+cli/                         # dap CLI (Go) - see cli/CONTRIBUTING.md
 ├── cmd/                     # Command implementations
 ├── internal/                # Internal packages (ui, exec)
 └── main.go                  # Entry point

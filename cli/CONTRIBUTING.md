@@ -21,7 +21,7 @@ dap cli test
 ## Project Structure
 
 ```
-.cli/
+cli/
 ├── main.go                 # Entry point
 ├── go.mod                  # Go module definition
 ├── go.sum                  # Dependency checksums
@@ -225,7 +225,7 @@ dap go test -v    # Verbose output
 ## Building
 
 ```bash
-dap go build      # Quick build to .cli/bin/dap
+dap go build      # Quick build to cli/bin/dap
 dap build         # Full rebuild (go mod tidy + gomod2nix + nix build)
 ```
 

@@ -6,11 +6,11 @@
         "nixpkgs": "nixpkgs"
       },
       "locked": {
-        "path": "./.cli",
+        "path": "./cli",
         "type": "path"
       },
       "original": {
-        "path": "./.cli",
+        "path": "./cli",
         "type": "path"
       },
       "parent": []

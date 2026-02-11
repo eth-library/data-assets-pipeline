@@ -33,15 +33,15 @@ func TestFindCliDir(t *testing.T) {
 	}
 	defer os.Chdir(origDir)
 
-	// Test from within .cli directory (where go.mod and gomod2nix.toml exist)
+	// Test from within cli directory (where go.mod and gomod2nix.toml exist)
 	if _, err := os.Stat("go.mod"); err == nil {
 		if _, err := os.Stat("gomod2nix.toml"); err == nil {
 			dir, err := findCliDir()
 			if err != nil {
-				t.Errorf("findCliDir() from .cli failed: %v", err)
+				t.Errorf("findCliDir() from cli failed: %v", err)
 			}
 			if dir != "." {
-				t.Errorf("findCliDir() from .cli = %q, want %q", dir, ".")
+				t.Errorf("findCliDir() from cli = %q, want %q", dir, ".")
 			}
 		}
 	}
@@ -61,8 +61,8 @@ func TestFindCliDirFromParent(t *testing.T) {
 		t.Skip("cannot change to parent directory")
 	}
 
-	// Check if .cli exists in parent (may not exist in Nix build environment)
-	if _, err := os.Stat(".cli"); os.IsNotExist(err) {
+	// Check if cli exists in parent (may not exist in Nix build environment)
+	if _, err := os.Stat("cli"); os.IsNotExist(err) {
 		t.Skip("not in expected directory structure (Nix build environment)")
 	}
 
@@ -71,8 +71,8 @@ func TestFindCliDirFromParent(t *testing.T) {
 		t.Errorf("findCliDir() from parent failed: %v", err)
 		return
 	}
-	// Should find .cli (either relative or absolute path ending in .cli)
-	if dir != ".cli" && filepath.Base(dir) != ".cli" {
-		t.Errorf("findCliDir() from parent = %q, want .cli or path ending in .cli", dir)
+	// Should find cli (either relative or absolute path ending in cli)
+	if dir != "cli" && filepath.Base(dir) != "cli" {
+		t.Errorf("findCliDir() from parent = %q, want cli or path ending in cli", dir)
 	}
 }

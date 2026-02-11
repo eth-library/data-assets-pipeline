@@ -1,0 +1,28 @@
+name: CLI
+
+on:
+  push:
+    branches: [main]
+    paths: ['cli/**']
+  pull_request:
+    paths: ['cli/**']
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: cachix/install-nix-action@v31
+      - name: Run tests
+        run: nix develop .#cli-dev --command dap cli test
+
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: cachix/install-nix-action@v31
+      - name: Lint and check formatting
+        run: nix develop .#cli-dev --command dap cli lint

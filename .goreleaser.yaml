@@ -1,0 +1,19 @@
+version: 2
+project_name: dap
+builds:
+  - dir: cli
+    binary: dap
+    env: [CGO_ENABLED=0]
+    goos: [linux, darwin]
+    goarch: [amd64, arm64]
+    ldflags:
+      - -s -w
+      - -X github.com/eth-library/dap/cli/cmd.version={{ .Version }}
+      - -X github.com/eth-library/dap/cli/cmd.commit={{ .Commit }}
+      - -X github.com/eth-library/dap/cli/cmd.date={{ .Date }}
+archives:
+  - name_template: "dap_{{ .Version }}_{{ .Os }}_{{ .Arch }}"
+checksum:
+  name_template: checksums.txt
+release:
+  name_template: "CLI {{ .Tag }}"

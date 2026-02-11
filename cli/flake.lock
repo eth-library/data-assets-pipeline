@@ -1,20 +1,5 @@
 {
   "nodes": {
-    "dap-cli": {
-      "inputs": {
-        "gomod2nix": "gomod2nix",
-        "nixpkgs": "nixpkgs"
-      },
-      "locked": {
-        "path": "./cli",
-        "type": "path"
-      },
-      "original": {
-        "path": "./cli",
-        "type": "path"
-      },
-      "parent": []
-    },
     "flake-utils": {
       "inputs": {
         "systems": "systems"
@@ -37,7 +22,6 @@
       "inputs": {
         "flake-utils": "flake-utils",
         "nixpkgs": [
-          "dap-cli",
           "nixpkgs"
         ]
       },
@@ -71,26 +55,10 @@
         "type": "github"
       }
     },
-    "nixpkgs_2": {
-      "locked": {
-        "lastModified": 1769900590,
-        "narHash": "sha256-I7Lmgj3owOTBGuauy9FL6qdpeK2umDoe07lM4V+PnyA=",
-        "owner": "NixOS",
-        "repo": "nixpkgs",
-        "rev": "41e216c0ca66c83b12ab7a98cc326b5db01db646",
-        "type": "github"
-      },
-      "original": {
-        "owner": "NixOS",
-        "ref": "nixos-25.11",
-        "repo": "nixpkgs",
-        "type": "github"
-      }
-    },
     "root": {
       "inputs": {
-        "dap-cli": "dap-cli",
-        "nixpkgs": "nixpkgs_2"
+        "gomod2nix": "gomod2nix",
+        "nixpkgs": "nixpkgs"
       }
     },
     "systems": {

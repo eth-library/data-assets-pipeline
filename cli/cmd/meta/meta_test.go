@@ -1,7 +1,7 @@
 package meta
 
 import (
-	"os"
+	"os/exec"
 	"path/filepath"
 	"testing"
 )
@@ -26,53 +26,17 @@ func TestCliCmdHasSubcommands(t *testing.T) {
 }
 
 func TestFindCliDir(t *testing.T) {
-	// Save current directory
-	origDir, err := os.Getwd()
-	if err != nil {
-		t.Fatal(err)
+	if _, err := exec.LookPath("git"); err != nil {
+		t.Skip("git not available (Nix build sandbox)")
 	}
-	defer os.Chdir(origDir)
-
-	// Test from within cli directory (where go.mod and gomod2nix.toml exist)
-	if _, err := os.Stat("go.mod"); err == nil {
-		if _, err := os.Stat("gomod2nix.toml"); err == nil {
-			dir, err := findCliDir()
-			if err != nil {
-				t.Errorf("findCliDir() from cli failed: %v", err)
-			}
-			if dir != "." {
-				t.Errorf("findCliDir() from cli = %q, want %q", dir, ".")
-			}
-		}
-	}
-}
-
-func TestFindCliDirFromParent(t *testing.T) {
-	// Save current directory
-	origDir, err := os.Getwd()
-	if err != nil {
-		t.Fatal(err)
-	}
-	defer os.Chdir(origDir)
-
-	// Go up to parent directory
-	parent := filepath.Dir(origDir)
-	if err := os.Chdir(parent); err != nil {
-		t.Skip("cannot change to parent directory")
-	}
-
-	// Check if cli exists in parent (may not exist in Nix build environment)
-	if _, err := os.Stat("cli"); os.IsNotExist(err) {
-		t.Skip("not in expected directory structure (Nix build environment)")
-	}
-
 	dir, err := findCliDir()
 	if err != nil {
-		t.Errorf("findCliDir() from parent failed: %v", err)
-		return
+		t.Fatalf("findCliDir() failed: %v", err)
 	}
-	// Should find cli (either relative or absolute path ending in cli)
-	if dir != "cli" && filepath.Base(dir) != "cli" {
-		t.Errorf("findCliDir() from parent = %q, want cli or path ending in cli", dir)
+	if filepath.Base(dir) != "cli" {
+		t.Errorf("findCliDir() = %q, want path ending in cli", dir)
+	}
+	if !filepath.IsAbs(dir) {
+		t.Errorf("findCliDir() = %q, want absolute path", dir)
 	}
 }

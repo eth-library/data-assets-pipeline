@@ -152,35 +152,13 @@ var CliLintCmd = &cobra.Command{
 	},
 }
 
-// findCliDir locates the cli directory relative to the current working directory or repo root.
+// findCliDir returns the absolute path to the cli directory using the git repo root.
 func findCliDir() (string, error) {
-	// Check if we're already in cli
-	if _, err := os.Stat("go.mod"); err == nil {
-		if _, err := os.Stat("gomod2nix.toml"); err == nil {
-			return ".", nil
-		}
+	root, err := exec.Run("git", "rev-parse", "--show-toplevel")
+	if err != nil {
+		return "", fmt.Errorf("not in a git repository: %w", err)
 	}
-
-	// Check for cli in current directory
-	if _, err := os.Stat("cli/go.mod"); err == nil {
-		return "cli", nil
-	}
-
-	// Walk up to find repo root with cli
-	dir, _ := os.Getwd()
-	for {
-		cliPath := filepath.Join(dir, "cli")
-		if _, err := os.Stat(filepath.Join(cliPath, "go.mod")); err == nil {
-			return cliPath, nil
-		}
-		parent := filepath.Dir(dir)
-		if parent == dir {
-			break
-		}
-		dir = parent
-	}
-
-	return "", os.ErrNotExist
+	return filepath.Join(strings.TrimSpace(root), "cli"), nil
 }
 
 func init() {

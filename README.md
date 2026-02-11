@@ -45,7 +45,7 @@ If not using [direnv](https://direnv.net/), activate the environment manually:
 nix develop          # Full environment (Python, uv, dap CLI, Go, kubectl, helm)
 nix develop .#minimal  # Minimal: Python, uv, dap CLI only
 nix develop .#k8s      # K8s: adds kubectl and helm
-nix develop .#cli-dev  # CLI development: Python, uv, Go (no dap CLI)
+nix develop .#cli-dev  # CLI development: Python, uv, dap CLI, Go
 ```
 
 Start the Dagster development server:
@@ -207,7 +207,7 @@ The Nix flake provides multiple development shells for different use cases:
 | default | `nix develop` | Python, uv, dap CLI, Go, kubectl, helm | Full development |
 | minimal | `nix develop .#minimal` | Python, uv, dap CLI | Running pipeline and tests |
 | k8s | `nix develop .#k8s` | Python, uv, dap CLI, kubectl, helm | Kubernetes deployment |
-| cli-dev | `nix develop .#cli-dev` | Python, uv, Go, gomod2nix | Working on the dap CLI |
+| cli-dev | `nix develop .#cli-dev` | Python, uv, dap CLI, Go, gomod2nix | Working on the dap CLI |
 
 The **default** shell is automatically loaded when using `direnv allow` (via `.envrc`) or running `nix develop` without arguments. It includes all tools needed for full development.
 

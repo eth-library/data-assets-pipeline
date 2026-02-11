@@ -42,8 +42,8 @@
           # K8s: Python + dap CLI + kubectl/helm (for deployment)
           k8s = mkDevShell (basePackages ++ cliPackage ++ k8sPackages);
 
-          # CLI development: Python + Go (for working on the dap CLI)
-          cli-dev = mkDevShell (basePackages ++ goPackages);
+          # CLI development: Python + dap CLI + Go (for working on the dap CLI)
+          cli-dev = mkDevShell (basePackages ++ cliPackage ++ goPackages);
         }
       );
     };

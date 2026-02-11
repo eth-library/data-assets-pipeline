@@ -5,7 +5,9 @@ name: CI
 on:
   push:
     branches: [ main ]
+    paths-ignore: ['cli/**']
   pull_request:
+    paths-ignore: ['cli/**']
 
 permissions:
   contents: read

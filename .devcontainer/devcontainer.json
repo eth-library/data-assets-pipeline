@@ -1,0 +1,44 @@
+{
+  "name": "DAP Development",
+  "image": "mcr.microsoft.com/devcontainers/base:ubuntu",
+  "features": {
+    "ghcr.io/devcontainers/features/nix:1": {
+      "multiUser": true,
+      "extraNixConfig": "experimental-features = nix-command flakes"
+    }
+  },
+  /*
+   * Setup direnv with nix-direnv for cached flake loading:
+   * 1. Install direnv and nix-direnv
+   * 2. Add direnv hook to bashrc (auto-loads env on cd)
+   * 3. Add direnv reload to bashrc (shows .envrc dev shell info on every shell)
+   * 4. Configure nix-direnv for flake caching
+   * 5. Pre-allow and pre-warm the environment (builds nix flake during container creation)
+   */
+  "onCreateCommand": "nix profile add nixpkgs#direnv nixpkgs#nix-direnv && echo 'eval \"$(direnv hook bash)\"' >> ~/.bashrc && echo 'direnv reload 2>/dev/null' >> ~/.bashrc && echo 'source $HOME/.nix-profile/share/nix-direnv/direnvrc' >> ~/.direnvrc && direnv allow . && direnv exec . true",
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "jnoortheen.nix-ide",
+        /*
+         * direnv extension (mkhl.direnv) not needed:
+         * - bash hook handles terminal environment
+         * - python.defaultInterpreterPath is set explicitly
+         * - avoids reload prompt on codespace startup
+         */
+        "ms-python.python",
+        "charliermarsh.ruff"
+      ],
+      "settings": {
+        "python.defaultInterpreterPath": "${workspaceFolder}/.venv/bin/python",
+        "python.terminal.activateEnvironment": false,
+        "terminal.integrated.shellIntegration.enabled": true
+      }
+    }
+  },
+  "remoteEnv": {
+    "DIRENV_WARN_TIMEOUT": "1m",
+    // Silence verbose direnv export output (e.g., "+VAR1 +VAR2 ...")
+    "DIRENV_LOG_FORMAT": ""
+  }
+}

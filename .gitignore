@@ -18,7 +18,9 @@ cli/bin/
 .env
 
 # IDE/editor settings
-.vscode/
+.vscode/*
+!.vscode/tasks.json
+!.vscode/settings.json
 .idea/
 
 # Python build directories

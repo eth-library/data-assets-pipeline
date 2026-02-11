@@ -122,3 +122,9 @@ func TestCompletionDisabled(t *testing.T) {
 		t.Error("Completion should be disabled")
 	}
 }
+
+func TestRootCommandHasVersion(t *testing.T) {
+	if rootCmd.Version == "" {
+		t.Error("Root command Version is empty")
+	}
+}

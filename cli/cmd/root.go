@@ -21,7 +21,8 @@ const (
 )
 
 var rootCmd = &cobra.Command{
-	Use:   "dap",
+	Use:     "dap",
+	Version: version,
 	Short: "Developer tools for the Data Archive Pipeline (DAP) Orchestrator",
 	Long: `dap is the CLI for the Data Archive Pipeline (DAP) Orchestrator.
 

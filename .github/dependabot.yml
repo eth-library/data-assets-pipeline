@@ -2,7 +2,7 @@ version: 2
 updates:
   - package-ecosystem: "uv"
     allow:
-      - dependency-type: "all"     # Allow both direct and indirect updates for all packages
+      - dependency-type: "direct"
     directory: "/"                 # Location of package manifests
     schedule:
       interval: "weekly"

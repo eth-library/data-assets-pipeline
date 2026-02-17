@@ -27,7 +27,8 @@ cli/bin/
 /da_pipeline.egg-info/
 
 # Dagster
-.dagster/
+.dagster/*
+!.dagster/dagster.yaml
 .tmp_dagster_home_*/
 /history/
 /schedules/

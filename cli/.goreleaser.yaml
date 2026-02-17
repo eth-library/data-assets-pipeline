@@ -1,8 +1,7 @@
 version: 2
 project_name: dap
 builds:
-  - dir: cli
-    binary: dap
+  - binary: dap
     env: [CGO_ENABLED=0]
     goos: [linux, darwin]
     goarch: [amd64, arm64]

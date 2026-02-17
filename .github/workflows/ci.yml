@@ -5,9 +5,35 @@ name: CI
 on:
   push:
     branches: [ main ]
-    paths-ignore: ['cli/**']
+    paths-ignore:
+      - 'docs/**'
+      - 'cli/**'
+      - 'helm/**'
+      - '.dev/**'
+      - '.devcontainer/**'
+      - '.vscode/**'
+      - '.github/**'
+      - '!.github/workflows/ci.yml'
+      - '*.md'
+      - 'LICENSE'
+      - 'flake.nix'
+      - 'flake.lock'
+      - '.gitignore'
   pull_request:
-    paths-ignore: ['cli/**']
+    paths-ignore:
+      - 'docs/**'
+      - 'cli/**'
+      - 'helm/**'
+      - '.dev/**'
+      - '.devcontainer/**'
+      - '.vscode/**'
+      - '.github/**'
+      - '!.github/workflows/ci.yml'
+      - '*.md'
+      - 'LICENSE'
+      - 'flake.nix'
+      - 'flake.lock'
+      - '.gitignore'
 
 permissions:
   contents: read

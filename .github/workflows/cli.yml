@@ -2,7 +2,6 @@ name: CLI
 
 on:
   push:
-    branches: [main]
     paths: ['cli/**']
   pull_request:
     paths: ['cli/**']

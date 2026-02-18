@@ -153,19 +153,20 @@ def _env_info() -> list[tuple[str, str, str]]:
     return rows
 
 
-def welcome(
-    quick: bool = typer.Option(False, "--quick", "-q", help="Skip tool version checks."),
-) -> None:
+def welcome() -> None:
     """Show welcome banner and environment info."""
     console.print()
     console.print(LOGO)
     console.print("  [hint]Data Archive Pipeline (DAP) — Orchestrator[/]")
     console.print("  ETH Library Zurich")
 
-    if not quick:
-        console.print()
-        console.print("  [title]Tools[/]")
-        _print_info_rows(_tool_info(), value_width=10)
+    console.print()
+    console.print("  [title]Tools[/]")
+    tool_rows = load_tool_cache()
+    if tool_rows is None:
+        tool_rows = _tool_info()
+        save_tool_cache(tool_rows)
+    _print_info_rows(tool_rows, value_width=10)
 
     console.print()
     console.print("  [title]Environment[/]")
@@ -213,6 +214,7 @@ def clean(
     if not yes:
         typer.confirm("Remove .venv and all caches?", abort=True)
     console.print(f"  {ARROW} Cleaning environment...")
+    delete_tool_cache()
 
     venv = Path(".venv")
     if venv.exists():

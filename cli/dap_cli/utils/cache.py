@@ -39,10 +39,7 @@ def load_tool_cache() -> list[tuple[str, str, str]] | None:
         data = json.loads(path.read_text(encoding="utf-8"))
         if data.get("fingerprint") != _compute_fingerprint():
             return None
-        return [
-            (t["name"], t["version"], "" if t["found"] else FAIL)
-            for t in data["tools"]
-        ]
+        return [(t["name"], t["version"], "" if t["found"] else FAIL) for t in data["tools"]]
     except (json.JSONDecodeError, KeyError, OSError):
         return None
 
@@ -52,8 +49,7 @@ def save_tool_cache(rows: list[tuple[str, str, str]]) -> None:
     data = {
         "fingerprint": _compute_fingerprint(),
         "tools": [
-            {"name": name, "version": ver, "found": ver != "not found"}
-            for name, ver, _ in rows
+            {"name": name, "version": ver, "found": ver != "not found"} for name, ver, _ in rows
         ],
     }
     try:

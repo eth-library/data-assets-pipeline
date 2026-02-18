@@ -1,12 +1,26 @@
 # Data Archive Pipeline (DAP) Orchestrator
 
 A [Dagster](https://dagster.io/)-based orchestrator for processing digital assets following the OAIS reference model. Manages Submission Information Packages (SIPs) with support for multiple metadata standards including Dublin Core, METS, and PREMIS for comprehensive digital preservation.
-> **Domain Terms**
->
-> - **METS** (Metadata Encoding and Transmission Standard): XML schema for encoding metadata about digital objects
-> - **OAIS** (Open Archival Information System): ISO reference model for digital preservation systems
-> - **SIP** (Submission Information Package): A package submitted to an archive for ingest
-> - **IE** (Intellectual Entity): A distinct unit of information to be preserved (e.g., a document, dataset)
+
+> [!NOTE]
+> This project is in **alpha** and actively evolving. APIs and behaviors may change. Provided as-is, with no guarantees on stability.
+
+## Contents
+
+- [Features](#features)
+- [Quick Start](#quick-start)
+- [Prerequisites](#prerequisites)
+- [Dev Toolchain](#dev-toolchain)
+- [Architecture](#architecture)
+- [Usage](#usage)
+- [Commands Reference](#commands-reference)
+- [Configuration](#configuration)
+- [Project Structure](#project-structure)
+- [Dependency Management](#dependency-management)
+- [Troubleshooting](#troubleshooting)
+- [Domain Terms](#domain-terms)
+- [License](#license)
+- [Further Reading](#further-reading)
 
 ## Features
 
@@ -16,16 +30,6 @@ A [Dagster](https://dagster.io/)-based orchestrator for processing digital asset
 - Automated file monitoring via Dagster sensors
 - Hot-reload development with instant feedback
 - Kubernetes-ready with Helm chart configuration
-
-> ### Project Status Notice
-> This project is in **alpha** and actively evolving.
->
-> - **Stability:** Bugs, breaking changes, or incomplete features may occur.
-> - **Evolution:** APIs and behaviors can change as we refine functionality.
->
-> Provided as‑is, with no guarantees on stability.
->
-> We appreciate your patience and feedback!
 
 ## Quick Start
 
@@ -42,16 +46,13 @@ direnv allow
 If not using [direnv](https://direnv.net/), activate the environment manually:
 
 ```bash
-nix develop          # Full environment (Python, uv, dap CLI, Go, kubectl, helm)
-nix develop .#minimal  # Minimal: Python, uv, dap CLI only
-nix develop .#k8s      # K8s: adds kubectl and helm
-nix develop .#cli-dev  # CLI development: Python, uv, dap CLI, Go
+nix develop
 ```
 
 Start the Dagster development server:
 
 ```bash
-dap dev
+dagster dev
 ```
 
 Open http://localhost:3000 in your browser.
@@ -62,7 +63,6 @@ Ensure you have the following installed:
 
 - Python 3.12+
 - [uv](https://github.com/astral-sh/uv) (Python package manager)
-- [Go 1.22+](https://go.dev/dl/) (for the dap CLI)
 
 Set up the project:
 
@@ -71,17 +71,15 @@ git clone https://github.com/eth-library/data-assets-pipeline.git
 cd data-assets-pipeline
 uv venv --python python3.12
 source .venv/bin/activate
-uv sync --extra dev
-
-# Build the dap CLI
-cd cli && go build -o bin/dap . && cd ..
-export PATH="$PWD/cli/bin:$PATH"
+uv sync
 ```
+
+The `dap` command becomes available automatically because the CLI is a UV workspace member.
 
 Start the Dagster development server:
 
 ```bash
-dap dev
+dagster dev
 ```
 
 Open http://localhost:3000 in your browser.
@@ -95,13 +93,32 @@ Open http://localhost:3000 in your browser.
 | [nix-direnv](https://github.com/nix-community/nix-direnv) | Fast Nix + direnv integration | [Install guide](https://github.com/nix-community/nix-direnv#installation) |
 | Python 3.12+ | Runtime | [python.org](https://www.python.org/downloads/) |
 | [uv](https://github.com/astral-sh/uv) | Fast Python package manager | `curl -LsSf https://astral.sh/uv/install.sh \| sh` |
-| [Go 1.22+](https://go.dev/dl/) | dap CLI build | [go.dev](https://go.dev/dl/) |
 
 For Kubernetes development, you'll also need:
 
 - Docker Desktop with Kubernetes enabled
 - kubectl
 - helm
+
+## Dev Toolchain
+
+The project uses a layered toolchain where each layer builds on the one below. See [cli/README.md](cli/README.md) for the full CLI reference.
+
+```
+nix flakes        Reproducible packages — pins exact versions of Python, uv, kubectl, etc.
+  └─ direnv       Auto-loading shell env — activates when you cd into the project
+      └─ nix-direnv   Cached flake evaluation — avoids re-evaluating the flake on every shell
+          └─ uv       Fast Python deps — installs packages from the lockfile in milliseconds
+              └─ dap   Ergonomic commands — wraps pytest, ruff, mypy, helm, kubectl
+```
+
+**Why each layer exists:**
+
+- **Nix flakes** (`flake.nix`): ensures every developer has identical tool versions. No "works on my machine".
+- **direnv** (`.envrc`): automatically loads the nix environment when you enter the project directory. No manual `nix develop`.
+- **nix-direnv**: caches the nix evaluation so shell startup stays fast. Without it, entering the directory would re-evaluate the flake every time.
+- **uv** (`pyproject.toml`, `uv.lock`): manages Python dependencies. Fast, deterministic, lockfile-based.
+- **dap CLI** (`cli/`): the commands documented below. Wraps quality checks, environment management, and Kubernetes deployment.
 
 ## Architecture
 
@@ -128,7 +145,7 @@ The `xml_file_sensor` monitors a configured directory for new XML files and auto
 Start the Dagster UI with hot-reload:
 
 ```bash
-dap dev
+dagster dev
 ```
 
 Run the test suite:
@@ -151,7 +168,7 @@ ops:
 
 ### Kubernetes Deployment
 
-Requires Docker Desktop with Kubernetes enabled (Settings → Kubernetes → Enable).
+Requires Docker Desktop with Kubernetes enabled (Settings > Kubernetes > Enable).
 
 Deploy to local Kubernetes:
 
@@ -173,6 +190,70 @@ Tear down the deployment:
 dap k8s down
 ```
 
+## Commands Reference
+
+Run `dap --help` to see all available commands.
+
+### Development
+
+| Command | Description |
+|---------|-------------|
+| `dap test [--scope core\|cli\|all]` | Run tests with pytest |
+| `dap lint [--fix] [--scope ...]` | Check code style and formatting with ruff |
+| `dap typecheck [--scope ...]` | Run type checking with mypy |
+| `dap check [--scope ...]` | Run all quality checks (ruff, mypy, pytest) |
+
+The `--scope` flag controls which code is checked:
+- `core` (default): `da_pipeline`, `da_pipeline_tests`
+- `cli`: `cli/dap_cli`, `cli/tests`
+- `all`: both core and CLI
+
+### Environment
+
+| Command | Description |
+|---------|-------------|
+| `dap welcome` | Show welcome banner and environment info |
+| `dap tools [--all]` | Show installed tool versions and paths |
+| `dap env` | Show environment paths and status |
+| `dap clean [--yes]` | Remove `.venv` and caches |
+| `dap reset [--yes]` | Clean and reinstall dependencies |
+
+`dap tools` shows the Python toolchain by default. Pass `--all` to include nix, direnv, kubectl, and helm.
+
+`dap clean` and `dap reset` prompt for confirmation. Pass `--yes` / `-y` to skip (for CI/scripts).
+
+### Kubernetes
+
+| Command | Description |
+|---------|-------------|
+| `dap k8s up` | Build and deploy to local Kubernetes |
+| `dap k8s down [--yes]` | Tear down deployment |
+| `dap k8s restart` | Rebuild image and rollout restart |
+| `dap k8s status` | Show pods and services |
+| `dap k8s logs` | Stream user code pod logs |
+| `dap k8s shell` | Interactive shell in user code pod |
+
+### Hint Commands
+
+These commands show how to use tools that are available directly in your shell:
+
+| Command | Description |
+|---------|-------------|
+| `dap uv` | Common uv commands (sync, lock, add, run) |
+| `dap dagster` | Common dagster/dg commands |
+| `dap direnv` | Common direnv commands (allow, reload, status) |
+
+### Global Flags
+
+| Flag | Description |
+|------|-------------|
+| `--version` / `-V` | Show CLI version |
+| `--help` | Show help |
+
+### CLI Development
+
+For working on the dap CLI itself (Python, Typer + Rich), see [cli/CONTRIBUTING.md](cli/CONTRIBUTING.md).
+
 ## Configuration
 
 ### Environment Variables
@@ -181,7 +262,9 @@ dap k8s down
 |----------|-------------|---------|
 | `DAGSTER_HOME` | Dagster instance directory | Project root (set by `.envrc`) |
 | `DAGSTER_TEST_DATA_PATH` | Directory containing METS XML files for the sensor to monitor | `da_pipeline_tests/test_data` |
-| `DAP_QUIET` | Set to `1` to hide the "Commands" hint in welcome banner | unset |
+| `DAP_THEME` | Override terminal background detection for colours (`light` or `dark`) | unset |
+| `DAP_QUIET` | Set to `1` to suppress Quick Start section in `dap welcome` | unset |
+| `NO_COLOR` | Set to `1` to disable all colour output (also respected in CI) | unset |
 
 Copy `.env.example` to `.env` and modify as needed.
 
@@ -190,7 +273,7 @@ Copy `.env.example` to `.env` and modify as needed.
 | File | Purpose |
 |------|---------|
 | `flake.nix` | Nix development environment with multiple shells (see below) |
-| `cli/` | Go CLI source code (see [cli/CONTRIBUTING.md](cli/CONTRIBUTING.md)) |
+| `cli/` | Python CLI source code (see [cli/CONTRIBUTING.md](cli/CONTRIBUTING.md)) |
 | `pyproject.toml` | Python project metadata and dependencies |
 | `dagster.yaml` | Dagster instance configuration |
 | `config.yaml` | Example run configuration for manual pipeline execution |
@@ -200,70 +283,18 @@ Copy `.env.example` to `.env` and modify as needed.
 
 ### Development Shells
 
-The Nix flake provides multiple development shells for different use cases:
-
-| Shell | Command | Packages | Use Case |
-|-------|---------|----------|----------|
-| default | `nix develop` | Python, uv, dap CLI, Go, kubectl, helm | Full development |
-| minimal | `nix develop .#minimal` | Python, uv, dap CLI | Running pipeline and tests |
-| k8s | `nix develop .#k8s` | Python, uv, dap CLI, kubectl, helm | Kubernetes deployment |
-| cli-dev | `nix develop .#cli-dev` | Python, uv, dap CLI, Go, gomod2nix | Working on the dap CLI |
-
-The **default** shell is automatically loaded when using `direnv allow` (via `.envrc`) or running `nix develop` without arguments. It includes all tools needed for full development.
-
-The specialized shells (`minimal`, `k8s`, `cli-dev`) are useful for CI pipelines where faster startup and smaller environments are beneficial.
-
-## Commands Reference
-
-Run `dap --help` to see all available commands.
-
-### Development
-
-| Command | Description |
-|---------|-------------|
-| `dap dev` | Start Dagster development server (localhost:3000) |
-| `dap test` | Run pytest test suite |
-| `dap check` | Run all quality checks (lint + typecheck + test) |
-| `dap lint` | Check code style with Ruff (use `--fix` to auto-format) |
-| `dap typecheck` | Type check with mypy |
-
-### Environment
-
-| Command | Description |
-|---------|-------------|
-| `dap versions` | Show tool versions (use `--all` for full list) |
-| `dap clean` | Remove `.venv` and caches |
-| `dap reset` | Clean and reinstall dependencies |
-
-### Dagster
-
-| Command | Description |
-|---------|-------------|
-| `dap materialize` | Materialize all Dagster assets |
-| `dap run` | Run the ingest_sip_job |
-
-### Kubernetes
-
-| Command | Description |
-|---------|-------------|
-| `dap k8s up` | Build and deploy to local Kubernetes (localhost:8080) |
-| `dap k8s down` | Tear down Kubernetes deployment |
-| `dap k8s restart` | Rebuild and restart user code pod |
-| `dap k8s status` | Show pods and services |
-| `dap k8s logs` | Stream logs from user code pod |
-| `dap k8s shell` | Open shell in user code pod |
-
-### CLI Development
-
-For working on the dap CLI itself, see [cli/CONTRIBUTING.md](cli/CONTRIBUTING.md).
+The Nix flake provides a single development shell activated via `direnv allow` or `nix develop`. It includes Python, uv, kubectl, and helm.
 
 ## Project Structure
 
 ```
-cli/                         # dap CLI (Go) - see cli/CONTRIBUTING.md
-├── cmd/                     # Command implementations
-├── internal/                # Internal packages (ui, exec)
-└── main.go                  # Entry point
+cli/                         # dap CLI (Python) — see cli/CONTRIBUTING.md
+├── dap_cli/
+│   ├── app.py               # Entry point — registers all commands
+│   ├── theme.py             # Rich console, ETH brand colors, symbols
+│   ├── commands/            # Command modules (dev, env, hints, k8s)
+│   └── utils/               # Subprocess helpers
+└── tests/                   # CLI tests
 
 da_pipeline/                 # Main package (Python)
 ├── definitions.py           # Dagster entry point (Definitions)
@@ -325,7 +356,7 @@ Verify Kubernetes is running:
 kubectl cluster-info
 ```
 
-Ensure Docker Desktop Kubernetes is enabled in Settings → Kubernetes → Enable Kubernetes.
+Ensure Docker Desktop Kubernetes is enabled in Settings > Kubernetes > Enable Kubernetes.
 
 ### Sensor not detecting files
 
@@ -333,15 +364,22 @@ Check the `DAGSTER_TEST_DATA_PATH` environment variable points to a directory co
 
 ### Test failures
 
-Ensure dependencies are installed with dev extras:
+Ensure dependencies are installed:
 
 ```bash
-uv sync --extra dev
+uv sync
 ```
+
+## Domain Terms
+
+- **METS** (Metadata Encoding and Transmission Standard): XML schema for encoding metadata about digital objects
+- **OAIS** (Open Archival Information System): ISO reference model for digital preservation systems
+- **SIP** (Submission Information Package): A package submitted to an archive for ingest
+- **IE** (Intellectual Entity): A distinct unit of information to be preserved (e.g., a document, dataset)
 
 ## License
 
-[Apache License 2.0](LICENSE) - © 2026 ETH Zurich
+[Apache License 2.0](LICENSE) - (c) 2026 ETH Zurich
 
 ## Further Reading
 
@@ -363,9 +401,8 @@ uv sync --extra dev
 ### Development Tools
 
 - [uv](https://github.com/astral-sh/uv) - Fast Python package manager
-- [Go](https://go.dev/) - Programming language for the dap CLI
-- [Cobra](https://github.com/spf13/cobra) - Go CLI framework
-- [Charmbracelet](https://charm.sh/) - Terminal UI libraries
+- [Typer](https://typer.tiangolo.com/) - Python CLI framework
+- [Rich](https://rich.readthedocs.io/) - Terminal formatting library
 - [Nix](https://nixos.org/) - Reproducible development environments
 - [direnv](https://direnv.net/) - Automatic environment loading
 - [Ruff](https://docs.astral.sh/ruff/) - Python linter and formatter

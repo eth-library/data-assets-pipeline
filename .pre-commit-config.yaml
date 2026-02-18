@@ -14,13 +14,3 @@ repos:
       - id: ruff
         args: [--fix]
       - id: ruff-format
-
-  # Go CLI hooks
-  - repo: local
-    hooks:
-      - id: cli-gomod2nix
-        name: "cli: Update gomod2nix.toml"
-        entry: bash -c 'cd cli && gomod2nix && git add gomod2nix.toml'
-        language: system
-        files: ^cli/go\.(mod|sum)$
-        pass_filenames: false

@@ -15,6 +15,7 @@ keywords = ["dagster", "mets", "oais", "sip", "digital-preservation"]
 dependencies = [
   "dagster>=1.10.15,<2.0.0",
   "dagster-webserver>=1.10.15,<2.0.0",
+  "dagster-dg-cli>=0.1.0",
   "pydantic>=2.11.4,<3.0.0",
   "data-archive-models>=0.1.0a2.dev",
 ]
@@ -39,12 +40,23 @@ production = [
 module_name = "da_pipeline.definitions"
 code_location_name = "da_pipeline"
 
+[tool.dg]
+directory_type = "project"
+
+[tool.dg.project]
+root_module = "da_pipeline"
+defs_module = "da_pipeline.definitions"
+code_location_name = "da_pipeline"
+
 [tool.hatch.build]
 packages = ["da_pipeline"]
 exclude = ["da_pipeline_tests"]
 
 [tool.hatch.build.targets.wheel]
 include = ["da_pipeline/**"]
+
+[tool.uv.workspace]
+members = ["cli"]
 
 [tool.uv.sources]
 data-archive-models = { index = "testpypi" }

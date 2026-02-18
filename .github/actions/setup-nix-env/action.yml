@@ -1,0 +1,15 @@
+name: Setup Nix Environment
+description: Install Nix with caching, use direnv to activate the devshell, and export environment to GitHub Actions
+
+runs:
+  using: composite
+  steps:
+    - uses: DeterminateSystems/nix-installer-action@main
+    - uses: DeterminateSystems/magic-nix-cache-action@main
+    - name: Activate devshell
+      shell: bash
+      run: |
+        nix shell nixpkgs#direnv --command bash -c '
+          direnv allow .
+          direnv export gha >> "$GITHUB_ENV"
+        '

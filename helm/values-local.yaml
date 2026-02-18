@@ -9,6 +9,20 @@ dagsterWebserver:
   service:
     type: LoadBalancer
     port: 8080
+  readinessProbe:
+    httpGet:
+      path: "/server_info"
+      port: 8080
+    periodSeconds: 20
+    timeoutSeconds: 10
+    successThreshold: 1
+    failureThreshold: 3
+  startupProbe:
+    httpGet:
+      path: "/server_info"
+      port: 8080
+    failureThreshold: 12
+    periodSeconds: 10
 
 ####################################################################################################
 # User Code Deployments - Local overrides

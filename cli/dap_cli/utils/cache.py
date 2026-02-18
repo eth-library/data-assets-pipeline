@@ -56,7 +56,7 @@ def save_tool_cache(rows: list[tuple[str, str, str]]) -> None:
         path = _cache_path()
         path.write_text(json.dumps(data), encoding="utf-8")
     except OSError:
-        pass
+        pass  # Cache write failures are non-fatal; tool info is transient.
 
 
 def delete_tool_cache() -> None:

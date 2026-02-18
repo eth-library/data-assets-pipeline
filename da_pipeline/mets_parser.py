@@ -323,10 +323,12 @@ def _get_representation_metadata(root: Element, admid: str) -> dict[str, str]:
         return {}
 
     premis_data = _parse_premis_metadata(tech_md)
-    return {
-        "label": premis_data.get("label"),
-        "preservationType": premis_data.get("preservationType"),
-    }
+    result: dict[str, str] = {}
+    if (label := premis_data.get("label")) is not None:
+        result["label"] = label
+    if (ptype := premis_data.get("preservationType")) is not None:
+        result["preservationType"] = ptype
+    return result
 
 
 def _build_ie_model(

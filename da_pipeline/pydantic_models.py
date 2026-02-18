@@ -45,13 +45,14 @@ Note:
 """
 
 from datetime import datetime
-from enum import Enum
+from enum import StrEnum
+from typing import Annotated
 from uuid import uuid4
 
-from pydantic import BaseModel, ConfigDict, Field, constr
+from pydantic import BaseModel, ConfigDict, Field, StringConstraints
 
 
-class FixityType(str, Enum):
+class FixityType(StrEnum):
     """
     Enumeration of supported cryptographic hash algorithms for file fixity.
 
@@ -108,7 +109,9 @@ class FixityModel(BaseModel):
     """
 
     fixity_type: FixityType = Field(..., description="Type of the checksum algorithm.")
-    fixity_value: constr(min_length=1) = Field(..., description="Checksum value.")
+    fixity_value: Annotated[str, StringConstraints(min_length=1)] = Field(
+        ..., description="Checksum value."
+    )
     file_id: str = Field(..., description="ID of the file this fixity belongs to")
 
     model_config = ConfigDict(frozen=True)
@@ -178,7 +181,7 @@ class FileModel(BaseModel):
     adm_ids: list[str] = Field(default_factory=list, description="Administrative metadata IDs")
 
 
-class RepresentationType(str, Enum):
+class RepresentationType(StrEnum):
     """
     OAIS-compliant representation types for digital objects.
 

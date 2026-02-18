@@ -51,18 +51,11 @@ jobs:
   setup-shell:
     runs-on: ubuntu-latest
     steps:
-      # Checkout repository with the latest version
-      - name: Checkout
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
+      - uses: ./.github/actions/setup-nix-env
 
-      # Install Nix with Flakes support
-      - name: Install Nix
-        uses: cachix/install-nix-action@v31
-
-      # Set up Nix Flakes shell environment and run tests
-      - name: Set up shell environment
-        run: |
-          nix develop --command true
+      - name: Run core quality checks
+        run: dap check --scope core
 
   # Job to build and publish Docker image
   publish:

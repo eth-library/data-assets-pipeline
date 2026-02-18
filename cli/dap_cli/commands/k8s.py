@@ -61,11 +61,11 @@ def _get_pending_pods() -> list[str]:
             NAMESPACE,
             "-o",
             "jsonpath="
-            "{range .items[*]}"
-            '{.metadata.name}{"|"}{.status.phase}{"|"}'
-            "{range .status.containerStatuses[*]}{.ready}{end}"
-            "{range .status.initContainerStatuses[*]}{.ready}{end}"
-            '{"\\n"}{end}',
+            + "{range .items[*]}"
+            + '{.metadata.name}{"|"}{.status.phase}{"|"}'
+            + "{range .status.containerStatuses[*]}{.ready}{end}"
+            + "{range .status.initContainerStatuses[*]}{.ready}{end}"
+            + '{"\\n"}{end}',
         ]
     )
     if code != 0 or not output.strip():

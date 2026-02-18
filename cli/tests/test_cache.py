@@ -1,11 +1,9 @@
 """Tests for tool version cache."""
 
-import json
 from pathlib import Path
 from unittest.mock import patch
 
 import pytest
-
 from dap_cli.utils.cache import (
     _compute_fingerprint,
     delete_tool_cache,

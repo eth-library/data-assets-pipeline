@@ -16,7 +16,8 @@ defs = Definitions(
     sensors=[xml_file_sensor],
     resources={
         "test_data_path": TestDataPathResource(
-            path=EnvVar("DAGSTER_TEST_DATA_PATH").get_value(default=_default_test_data_path),
+            path=EnvVar("DAGSTER_TEST_DATA_PATH").get_value(default=_default_test_data_path)
+            or _default_test_data_path,
         ),
     },
 )

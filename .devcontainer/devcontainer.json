@@ -1,6 +1,6 @@
 {
   "name": "DAP Development",
-  "image": "ghcr.io/eth-library/nix-aerie-python:latest",
+  "image": "ghcr.io/eth-library/nix-aerie:latest",
   "remoteUser": "dev",
   "onCreateCommand": "direnv allow .",
   "customizations": {

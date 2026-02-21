@@ -50,12 +50,14 @@ jobs:
   # Job to set up shell environment and run tests
   setup-shell:
     runs-on: ubuntu-latest
+    container:
+      image: ghcr.io/eth-library/nix-aerie-python:latest
     steps:
       - uses: actions/checkout@v4
-      - uses: ./.github/actions/setup-nix-env
-
-      - name: Run core quality checks
-        run: dap check --scope core
+      # activates nix flakes shell via .envrc
+      - uses: eth-library/nix-aerie/.github/actions/direnv-run@main
+        with:
+          command: dap check --scope core
 
   # Job to build and publish Docker image
   publish:

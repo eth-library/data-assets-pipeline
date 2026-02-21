@@ -39,6 +39,7 @@ on:
 
 permissions:
   contents: read
+  packages: read
 
 # Environment variables used across jobs
 env:
@@ -52,6 +53,9 @@ jobs:
     runs-on: ubuntu-latest
     container:
       image: ghcr.io/eth-library/nix-aerie-python:latest
+      credentials:
+        username: ${{ github.actor }}
+        password: ${{ secrets.GITHUB_TOKEN }}
     steps:
       - uses: actions/checkout@v4
       # activates nix flakes shell via .envrc

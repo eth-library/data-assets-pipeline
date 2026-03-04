@@ -10,14 +10,13 @@
         /*
          * direnv extension (mkhl.direnv) not needed:
          * - bash hook handles terminal environment
-         * - python.defaultInterpreterPath is set explicitly
+         * - python extension auto-discovers .venv
          * - avoids reload prompt on codespace startup
          */
         "ms-python.python",
         "charliermarsh.ruff"
       ],
       "settings": {
-        "python.defaultInterpreterPath": "${workspaceFolder}/.venv/bin/python",
         "python.terminal.activateEnvironment": false,
         "terminal.integrated.shellIntegration.enabled": true
       }

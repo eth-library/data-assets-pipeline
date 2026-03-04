@@ -2,7 +2,7 @@
   "name": "DAP Development",
   "image": "ghcr.io/eth-library/nix-aerie-python:latest",
   "remoteUser": "dev",
-  "onCreateCommand": "direnv allow .",
+  "onCreateCommand": "direnv allow . && direnv exec . true",
   "customizations": {
     "vscode": {
       "extensions": [

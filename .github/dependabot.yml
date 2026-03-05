@@ -3,6 +3,10 @@ updates:
   - package-ecosystem: "uv"
     allow:
       - dependency-type: "direct"
-    directory: "/"                 # Location of package manifests
+    directory: "/"
     schedule:
       interval: "weekly"
+    groups:
+      dagster:
+        patterns:
+          - "dagster*"

@@ -1,5 +1,5 @@
 *
 !pyproject.toml
 !uv.lock
-!da_pipeline/
+!arca_flow/
 !cli/pyproject.toml

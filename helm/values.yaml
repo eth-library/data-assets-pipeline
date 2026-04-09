@@ -1,4 +1,4 @@
-# Base Helm values for da-pipeline Dagster deployment
+# Base Helm values for arca-flow Dagster deployment
 # These values are shared across all environments
 ---
 
@@ -10,14 +10,14 @@ dagster-user-deployments:
   enableSubchart: true
 
   deployments:
-    - name: "da-pipeline"
+    - name: "arca-flow"
       image:
-        repository: da-pipeline
+        repository: arca-flow
         tag: latest
         pullPolicy: Always
       dagsterApiGrpcArgs:
         - "--python-file"
-        - "/da_pipeline/definitions.py"
+        - "/arca_flow/definitions.py"
       port: 3030
       includeConfigInLaunchedRuns:
         enabled: true

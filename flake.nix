@@ -1,5 +1,5 @@
 {
-  description = "Development environment for the Data Archive Pipeline (DAP) Orchestrator";
+  description = "Development environment for Arca Flow";
 
   inputs = {
     nix-aerie.url = "github:eth-library/nix-aerie";

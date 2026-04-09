@@ -1,5 +1,5 @@
 {
-  "name": "DAP Development",
+  "name": "Arca Flow Development",
   "image": "ghcr.io/eth-library/nix-aerie-python:latest",
   "remoteUser": "dev",
   "onCreateCommand": "direnv allow . && direnv exec . true",

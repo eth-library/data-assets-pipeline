@@ -1,6 +1,14 @@
-# Data Archive Pipeline (DAP) Orchestrator
+# arca-flow
 
-A [Dagster](https://dagster.io/)-based orchestrator for processing digital assets following the OAIS reference model. Manages Submission Information Packages (SIPs) with support for multiple metadata standards including Dublin Core, METS, and PREMIS for comprehensive digital preservation.
+**ETH Library Zurich · Data Archive · Pipeline Orchestrator**
+
+[!TIP]
+> This repository is part of [Arca](https://github.com/eth-library/arca),
+> ETH Library's digital preservation pipeline. Visit the umbrella
+> repository to understand the full system architecture and how to spin up
+> the entire stack locally.
+
+A [Dagster](https://dagster.io/)-powered orchestrator that ingests digital assets and assembles OAIS-compliant Submission Information Packages (SIPs), parsing METS/PREMIS metadata along the way.
 
 > [!NOTE]
 > This project is in **alpha** and actively evolving. APIs and behaviors may change. Provided as-is, with no guarantees on stability.
@@ -38,8 +46,8 @@ A [Dagster](https://dagster.io/)-based orchestrator for processing digital asset
 Clone the repository and enter the development environment:
 
 ```bash
-git clone https://github.com/eth-library/data-assets-pipeline.git
-cd data-assets-pipeline
+git clone https://github.com/eth-library/arca-flow.git
+cd arca-flow
 direnv allow
 ```
 
@@ -67,8 +75,8 @@ Ensure you have the following installed:
 Set up the project:
 
 ```bash
-git clone https://github.com/eth-library/data-assets-pipeline.git
-cd data-assets-pipeline
+git clone https://github.com/eth-library/arca-flow.git
+cd arca-flow
 uv venv --python python3.12
 source .venv/bin/activate
 uv sync

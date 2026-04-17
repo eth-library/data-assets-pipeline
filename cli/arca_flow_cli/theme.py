@@ -1,4 +1,4 @@
-"""ETH Zurich brand colours and Rich console configuration for the dap CLI.
+"""ETH Zurich brand colours and Rich console configuration for the arca-flow CLI.
 
 Uses official ETH Zurich brand colours and their CI/CD-defined shades.
 Light terminals use 100% base colours; dark terminals use 80% shades
@@ -68,7 +68,7 @@ ETH_BRONZE = _PALETTE["bronze"][_bg]
 ETH_RED = _PALETTE["red"][_bg]
 ETH_GREY = _PALETTE["grey"][_bg]
 
-dap_theme = Theme(
+arca_flow_theme = Theme(
     {
         "success": f"bold {ETH_GREEN}",
         "error": f"bold {ETH_RED}",
@@ -81,7 +81,7 @@ dap_theme = Theme(
 )
 
 console = Console(
-    theme=dap_theme,
+    theme=arca_flow_theme,
     stderr=True,
     no_color=os.getenv("NO_COLOR") is not None or _is_ci(),
 )

@@ -14,7 +14,7 @@ from arca_flow_cli.utils.cache import (
 SAMPLE_ROWS = [
     ("python", "3.12.12", ""),
     ("uv", "0.9.29", ""),
-    ("dap", "0.1.0", ""),
+    ("arca-flow", "0.1.0", ""),
     ("ruff", "not found", "[error]\u2717[/]"),
 ]
 

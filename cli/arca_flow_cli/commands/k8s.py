@@ -342,7 +342,7 @@ def status() -> None:
     code, _ = run_capture(["kubectl", "get", "namespace", NAMESPACE])
     if code != 0:
         console.print(f"  {WARN} Deployment not running")
-        console.print("  [hint]Run 'dap k8s up' to deploy[/]")
+        console.print("  [hint]Run 'af k8s up' to deploy[/]")
         console.print()
         return
 

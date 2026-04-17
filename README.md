@@ -1,6 +1,6 @@
 # arca-flow
 
-**ETH Library Zurich · Data Archive · Pipeline Orchestrator**
+**ETH Library Zurich · Data Archive · Orchestrator Engine**
 
 > [!TIP]
 > This repository is part of [Arca](https://github.com/eth-library/arca),

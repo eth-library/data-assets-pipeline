@@ -3,7 +3,7 @@
 Uses official ETH Zurich brand colours and their CI/CD-defined shades.
 Light terminals use 100% base colours; dark terminals use 80% shades
 for readability. Detection order:
-  1. DAP_THEME=light|dark  (explicit override)
+  1. ARCA_FLOW_THEME=light|dark  (explicit override)
   2. COLORFGBG env var     (set by some terminals)
   3. Default: dark         (most developer terminals)
 
@@ -38,7 +38,7 @@ def _detect_background() -> str:
 
     Safe fallback: always returns a valid value, never raises.
     """
-    override = os.getenv("DAP_THEME", "").lower()
+    override = os.getenv("ARCA_FLOW_THEME", "").lower()
     if override in ("light", "dark"):
         return override
 

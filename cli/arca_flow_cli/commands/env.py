@@ -172,7 +172,7 @@ def welcome() -> None:
     console.print("  [title]Environment[/]")
     _print_info_rows(_env_info())
 
-    if not os.getenv("DAP_QUIET"):
+    if not os.getenv("ARCA_FLOW_QUIET"):
         console.print()
         console.print("  [title]Quick Start[/]")
         console.print(f"  {'dap test':<14} Run tests (pytest)")

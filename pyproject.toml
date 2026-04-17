@@ -50,7 +50,7 @@ code_location_name = "arca_flow"
 
 [tool.hatch.build]
 packages = ["arca"]
-exclude = ["arca_flow_tests"]
+exclude = ["tests"]
 
 [tool.hatch.build.targets.wheel]
 include = ["arca/flow/core/**"]
@@ -78,5 +78,5 @@ ignore = ["E501"]  # line length handled separately
 quote-style = "double"
 
 [tool.pytest.ini_options]
-testpaths = ["arca_flow_tests"]
+testpaths = ["tests"]
 pythonpath = ["."]

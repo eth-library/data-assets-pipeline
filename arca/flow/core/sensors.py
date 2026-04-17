@@ -55,7 +55,7 @@ ingest_sip_job = define_asset_job(
 
 # Default test data path for local development (relative to source)
 _default_test_data_path = str(
-    Path(__file__).parent.parent.parent.parent / "arca_flow_tests" / "test_data"
+    Path(__file__).parent.parent.parent.parent / "tests" / "core" / "test_data"
 )
 
 
@@ -69,7 +69,7 @@ class TestDataPathResource(ConfigurableResource):
 
     Configuration:
         - Local dev: Uses default path relative to source
-        - K8s: Set DAGSTER_TEST_DATA_PATH=/arca_flow_tests/test_data
+        - K8s: Set DAGSTER_TEST_DATA_PATH=/tests/core/test_data
     """
 
     path: str

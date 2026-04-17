@@ -48,7 +48,7 @@ direnv allow  # one-time approval
 | `arca-flow check [--scope ...]` | Run all quality checks (ruff, mypy, pytest) |
 
 The `--scope` flag controls which code is checked:
-- `core` (default): `arca/flow/core`, `arca_flow_tests`
+- `core` (default): `arca/flow/core`, `tests/core`
 - `cli`: `cli/arca`, `cli/tests`
 - `all`: both core and CLI
 

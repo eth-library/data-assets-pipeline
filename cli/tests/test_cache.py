@@ -52,13 +52,13 @@ class TestToolCache:
         assert load_tool_cache() is None
 
     def test_load_returns_none_on_corrupt_json(self):
-        cache_path = Path(".venv") / ".dap-tool-cache.json"
+        cache_path = Path(".venv") / ".arca-flow-tool-cache.json"
         cache_path.write_text("not-json{{{")
         assert load_tool_cache() is None
 
     def test_delete_removes_file(self):
         save_tool_cache(SAMPLE_ROWS)
-        cache_path = Path(".venv") / ".dap-tool-cache.json"
+        cache_path = Path(".venv") / ".arca-flow-tool-cache.json"
         assert cache_path.is_file()
         delete_tool_cache()
         assert not cache_path.is_file()

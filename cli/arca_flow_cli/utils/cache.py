@@ -1,6 +1,6 @@
 """File-hash-based cache for tool version checks.
 
-Stores tool versions in ``.venv/.dap-tool-cache.json`` and invalidates
+Stores tool versions in ``.venv/.arca-flow-tool-cache.json`` and invalidates
 when any of ``uv.lock``, ``flake.lock``, or ``flake.nix`` change.
 """
 
@@ -11,7 +11,7 @@ from pathlib import Path
 from arca_flow_cli.theme import FAIL
 
 _WATCHED_FILES = ("uv.lock", "flake.lock", "flake.nix")
-_CACHE_FILE = ".dap-tool-cache.json"
+_CACHE_FILE = ".arca-flow-tool-cache.json"
 
 
 def _cache_path() -> Path:

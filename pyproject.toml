@@ -86,6 +86,10 @@ namespace_packages = true
 explicit_package_bases = true
 mypy_path = "."
 
+[[tool.mypy.overrides]]
+module = ["arca_flow_cli.*"]
+ignore_missing_imports = true
+
 [tool.pytest.ini_options]
 testpaths = ["arca/flow/tests"]
 pythonpath = ["."]

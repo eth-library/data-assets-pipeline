@@ -9,7 +9,7 @@ resolution-markers = [
 [manifest]
 members = [
     "arca-flow",
-    "dap-cli",
+    "arca-flow-cli",
 ]
 
 [[package]]
@@ -105,6 +105,21 @@ requires-dist = [
     { name = "ruff", marker = "extra == 'dev'", specifier = ">=0.15.10" },
 ]
 provides-extras = ["dev", "production"]
+
+[[package]]
+name = "arca-flow-cli"
+version = "0.1.0"
+source = { editable = "cli" }
+dependencies = [
+    { name = "rich" },
+    { name = "typer" },
+]
+
+[package.metadata]
+requires-dist = [
+    { name = "rich", specifier = ">=13.0.0" },
+    { name = "typer", specifier = ">=0.15.0" },
+]
 
 [[package]]
 name = "attrs"
@@ -542,21 +557,6 @@ dependencies = [
 sdist = { url = "https://files.pythonhosted.org/packages/96/0d/d97e7f09ec1b823b9d054cfc67e255428d97851b938287377e02c112bb46/dagster_webserver-1.13.0.tar.gz", hash = "sha256:a07ea2b3112ab05a0c26826d4b37ac0d7ac06eefcce36bc26596a3aed7714c5e", size = 11776087, upload-time = "2026-04-09T18:13:44.118Z" }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/f8/f5/2aa0d0bc7449b3307a939ac01e49b4f7ced752317ae977bc1c871b40cd3b/dagster_webserver-1.13.0-py3-none-any.whl", hash = "sha256:70413ff941b2d47f0654abf9aa2e3a7a74a36e3b1d133b2ca5431410cbae8a05", size = 12127238, upload-time = "2026-04-09T18:13:41.464Z" },
-]
-
-[[package]]
-name = "dap-cli"
-version = "0.1.0"
-source = { editable = "cli" }
-dependencies = [
-    { name = "rich" },
-    { name = "typer" },
-]
-
-[package.metadata]
-requires-dist = [
-    { name = "rich", specifier = ">=13.0.0" },
-    { name = "typer", specifier = ">=0.15.0" },
 ]
 
 [[package]]

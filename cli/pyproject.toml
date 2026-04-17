@@ -15,3 +15,4 @@ dependencies = [
 
 [project.scripts]
 arca-flow = "arca_flow_cli.app:main"
+af = "arca_flow_cli.app:main"

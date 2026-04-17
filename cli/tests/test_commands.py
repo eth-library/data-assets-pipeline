@@ -1,4 +1,4 @@
-"""Tests for dap CLI commands — structural and behavioral."""
+"""Tests for arca-flow CLI commands — structural and behavioral."""
 
 from unittest.mock import patch
 
@@ -14,7 +14,7 @@ runner = CliRunner()
 def test_help():
     result = runner.invoke(app, ["--help"])
     assert result.exit_code == 0
-    assert "Developer tools" in result.output
+    assert "arca-flow" in result.output
 
 
 def test_test_help():

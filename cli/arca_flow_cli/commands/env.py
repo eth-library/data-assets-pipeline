@@ -10,12 +10,12 @@ from pathlib import Path
 
 import typer
 
-from arca_flow_cli.theme import ARROW, ETH_BLUE_LOGO, FAIL, OK, WARN, console
+from arca_flow_cli.banner import render_startup_banner
+from arca_flow_cli.theme import ARROW, FAIL, OK, WARN, console
 from arca_flow_cli.utils.cache import delete_tool_cache, load_tool_cache, save_tool_cache
 from arca_flow_cli.utils.run import run_capture, run_passthrough
 
-_logo_text = files("arca_flow_cli").joinpath("logo.txt").read_text(encoding="utf-8")
-LOGO = "\n".join(f"  [{ETH_BLUE_LOGO}]{line}[/]" for line in _logo_text.splitlines())
+_LOGO = files("arca_flow_cli").joinpath("logo.txt").read_text(encoding="utf-8")
 
 
 def _get_version(cmd: list[str], prefix: str = "") -> str | None:
@@ -51,7 +51,7 @@ def _nix_tools() -> list[tuple[str, str, str]]:
 def _python_tools() -> list[tuple[str, str, str]]:
     """Python packages installed by uv into the virtualenv."""
     return [
-        _tool_row("dap", version("arca-flow-cli"), _get_path("dap")),
+        _tool_row("arca-flow", version("arca-flow-cli"), _get_path("arca-flow")),
         _tool_row(
             "dagster",
             _get_version(["python", "-c", "import dagster; print(dagster.__version__)"]),
@@ -156,9 +156,7 @@ def _env_info() -> list[tuple[str, str, str]]:
 def welcome() -> None:
     """Show welcome banner and environment info."""
     console.print()
-    console.print(LOGO)
-    console.print("  [hint]Data Archive Pipeline (DAP) — Orchestrator[/]")
-    console.print("  ETH Library Zurich")
+    render_startup_banner(console, "arca-flow", "Orchestration Engine", _LOGO)
 
     console.print()
     console.print("  [title]Tools[/]")
@@ -175,11 +173,11 @@ def welcome() -> None:
     if not os.getenv("ARCA_FLOW_QUIET"):
         console.print()
         console.print("  [title]Quick Start[/]")
-        console.print(f"  {'dap test':<14} Run tests (pytest)")
-        console.print(f"  {'dap check':<14} Run all quality checks (lint, typecheck, test)")
-        console.print(f"  {'dap tools':<14} Show installed tool versions")
+        console.print(f"  {'af test':<14} Run tests (pytest)")
+        console.print(f"  {'af check':<14} Run all quality checks (lint, typecheck, test)")
+        console.print(f"  {'af tools':<14} Show installed tool versions")
         console.print()
-        console.print("  [hint]Run 'dap --help' for all commands[/]")
+        console.print("  [hint]Run 'af --help' for all commands[/]")
 
     console.print()
 
